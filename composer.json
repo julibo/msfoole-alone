@@ -25,14 +25,14 @@
     }
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.2.0",
     "ext-swoole": "~4.3.0",
     "symfony/console": "~4.2.3",
     "symfony/yaml": "~4.2.3",
     "chency147/cli-message": "~0.1.1",
-    "topthink/think-log": "dev-master",
-    "topthink/think-container": "dev-master",
-    "topthink/think-helper": "dev-master"
+    "topthink/think-log": "~1.0",
+    "topthink/think-container": "~1.0",
+    "topthink/think-helper": "~1.0"
   },
   "require-dev" : {},
   "autoload": {
