@@ -285,7 +285,7 @@ class HttpServer extends BaseServer
                 if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
                     $this->counter++;
                 }
-                if ($this->counter > 3) {
+                if ($this->counter > 30) {
                     $server->shutdown();
                 }
             });

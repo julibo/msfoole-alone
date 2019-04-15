@@ -44,7 +44,7 @@ environments:
   APPLICATION__DEFAULT__CONTROLLER: Index
   APPLICATION__DEFAULT__ACTION: index
   APPLICATION__DEFAULT__KEY: 700040d41f47592c
-  APPLICATION__ALLOW__CONTROLLER: \App\COntroller\Index\Index
+  APPLICATION__ALLOW__CONTROLLER: App\Controller\Index\Index
   APPLICATION__ALLOW__OUTPUT: success,failure,pong,hello
   APPLICATION__ACCESS__ORIGIN: http://localhost:8080
 
@@ -62,7 +62,7 @@ environments:
   LOG__DEBUG: true
   LOG__RECORD_TRACE: true
 
-  COOKIE__PREFIX: msf_
+  COOKIE__PREFIX: msf-
   COOKIE__EXPIRE: 3600
   COOKIE__PATH: /
   COOKIE__DOMAIN:

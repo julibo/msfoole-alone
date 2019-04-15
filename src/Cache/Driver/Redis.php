@@ -13,7 +13,6 @@ namespace Julibo\Msfoole\Cache\Driver;
 
 use Julibo\Msfoole\RedisDriver;
 use Julibo\Msfoole\Cache\Driver;
-use Julibo\Msfoole\Helper;
 
 class Redis extends Driver
 {
@@ -43,22 +42,16 @@ class Redis extends Driver
         } else {
             $key = $this->getCacheKey($name);
             $value = $this->handler->get($key);
-//            $arrValue = Helper::isJson($value, true);
-//            if ($this->options['serialize'] && $arrValue) {
-//                $value = $arrValue;
-//            }
+            if (!is_numeric($value)) {
+                $value = unserialize($value);
+            }
         }
         return $value;
     }
 
     public function set($name, $value, $expire = null)
     {
-//        if (!is_scalar($value) && $this->options['serialize']) {
-//            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
-//        }
-        if (!is_scalar($value) && $this->options['serialize']) {
-            $value = serialize($value);
-        }
+        $value = serialize($value);
         $key = $this->getCacheKey($name);
         return $this->handler->set($key, $value, $expire);
     }

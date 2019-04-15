@@ -47,7 +47,7 @@ class Cache
      */
     public function connect(array $options = [])
     {
-        $type = !empty($options['driver']) ? $options['driver'] : 'Redis';
+        $type = !empty($options['driver']) ? $options['driver'] : 'redis';
         $this->driver = $type;
         return Loader::factory($type, '\\Julibo\\Msfoole\\Cache\\Driver\\', $options);
     }

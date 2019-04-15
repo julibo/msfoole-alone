@@ -188,7 +188,7 @@ class Application
         if ($executionTime > Config::get('log.slow_time')) {
             Log::setEnv($this->httpRequest)->slow('当前方法执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
         }
-        unset($this->httpRequest, $this->httpResponse, $this->chan, $this->cookie);
+        unset($this->chan, $this->cookie, $this->httpRequest, $this->httpResponse);
 
     }
 

@@ -72,7 +72,7 @@ abstract class Controller
      * 初始化方法
      * @return mixed
      */
-    abstract public function init();
+    abstract protected function init();
 
     /**
      * 通过token获取用户信息
