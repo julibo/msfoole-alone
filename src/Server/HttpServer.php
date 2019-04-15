@@ -359,7 +359,7 @@ class HttpServer extends BaseServer
     public function WebsocketonOpen(Websocket $server, SwooleRequest $request)
     {
         // 开启websocket连接
-        // print_r($request);
+        print_r($request);
 
     }
 
@@ -371,7 +371,7 @@ class HttpServer extends BaseServer
     public function WebsocketonMessage(Websocket $server, Webframe $frame)
     {
         // 执行应用并响应
-        // print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
+        print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
 
     }
 

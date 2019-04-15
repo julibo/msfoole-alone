@@ -44,7 +44,6 @@ environments:
   APPLICATION__DEFAULT__ACTION: index
   APPLICATION__DEFAULT__KEY: 700040d41f47592c
   APPLICATION__ALLOW__CONTROLLER: App\Controller\Index\Index
-  APPLICATION__ALLOW__OUTPUT: success,failure,pong,hello
   APPLICATION__ACCESS__ORIGIN: http://localhost:8080
 
   LOG__TYPE: File
