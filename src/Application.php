@@ -176,8 +176,6 @@ class Application
         }
     }
 
-
-
     /**
      * 释放资源
      * @return mixed
@@ -200,7 +198,6 @@ class Application
     public function __destruct()
     {
         $this->destruct();
-
     }
 
 }

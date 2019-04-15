@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------
-// | msfoole [ 基于swoole4的简易微服务框架 ]
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
 // +----------------------------------------------------------------------
 // | Copyright (c) 2018 http://julibo.com All rights reserved.
 // +----------------------------------------------------------------------
@@ -43,18 +43,21 @@ class Redis extends Driver
         } else {
             $key = $this->getCacheKey($name);
             $value = $this->handler->get($key);
-            $arrValue = Helper::isJson($value, true);
-            if ($this->options['serialize'] && $arrValue) {
-                $value = $arrValue;
-            }
+//            $arrValue = Helper::isJson($value, true);
+//            if ($this->options['serialize'] && $arrValue) {
+//                $value = $arrValue;
+//            }
         }
         return $value;
     }
 
     public function set($name, $value, $expire = null)
     {
+//        if (!is_scalar($value) && $this->options['serialize']) {
+//            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+//        }
         if (!is_scalar($value) && $this->options['serialize']) {
-            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+            $value = serialize($value);
         }
         $key = $this->getCacheKey($name);
         return $this->handler->set($key, $value, $expire);
