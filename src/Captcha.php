@@ -152,9 +152,11 @@ class Captcha
         imagepng($this->im);
         $content = ob_get_clean();
         imagedestroy($this->im);
-        $result = [];
-        $result['verifyCode'] =  implode('', $code);
-        $result['verifyImg'] = 'data:image/jpeg;base64,' . base64_encode($content);
+        $result = [
+            'token' => Helper::guid(),
+            'verifyCode' =>  implode('', $code),
+            'verifyImg' => 'data:image/jpeg;base64,' . base64_encode($content)
+        ];
         return  $result;
     }
 

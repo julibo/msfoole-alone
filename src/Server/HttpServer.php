@@ -24,6 +24,7 @@ use Julibo\Msfoole\Channel;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
+use Julibo\Msfoole\WebSocket as SocketApp;
 use Julibo\Msfoole\Interfaces\Server as BaseServer;
 
 class HttpServer extends BaseServer
@@ -95,6 +96,12 @@ class HttpServer extends BaseServer
     protected $health_switch = false;
 
     /**
+     * 健康检查极限值
+     * @var int
+     */
+    protected $health_limit = 10;
+
+    /**
      * 初始化
      */
     protected function init()
@@ -110,6 +117,7 @@ class HttpServer extends BaseServer
         $this->health_host = $this->config['health']['host'] ?? '127.0.0.1';
         $this->health_uri = $this->config['health']['uri'] ?? '/Index/Index/health';
         $this->health_permit = $this->config['health']['permit'] ?? '700040d41f47592c';
+        $this->health_limit = $this->config['health']['limit'] ?? 10;
         if ($this->pattern) {
             $this->serverType = 'socket';
         }
@@ -140,7 +148,7 @@ class HttpServer extends BaseServer
             $this->table->column('counter', table::TYPE_INT, 4); // 计数器
             $this->table->column('create_time', table::TYPE_INT, 4); // 创建时间戳
             $this->table->column('update_time', table::TYPE_INT, 4); // 更新时间戳
-            $this->table->column('user_info', table::TYPE_STRING, 1024); // 用户信息描述
+            $this->table->column('user', table::TYPE_STRING, 1024); // 用户信息描述
             $this->table->create();
         }
     }
@@ -291,8 +299,10 @@ class HttpServer extends BaseServer
                 $result = $cli->get($this->health_uri);
                 if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
                     $this->counter++;
+                } else {
+                    $this->counter = 0;
                 }
-                if ($this->counter > 3) {
+                if ($this->counter > $this->health_limit) {
                     $server->shutdown();
                 }
             });
@@ -352,9 +362,29 @@ class HttpServer extends BaseServer
             $response->status(404);
             $response->end();
         } else {
-            # todo 跨域
-            $app = new Application($request, $response, $this->chan);
-            $app->handling();
+            # 服务器端处理跨域
+            if (isset($request->header['origin'])) {
+                $origin = true;
+                if (is_array(Config::get('application.access.origin'))) {
+                    in_array($request->header['origin'], Config::get('application.access.origin')) ? : $origin = false;
+                } else {
+                    $request->header['origin'] == Config::get('application.access.origin') ? : $origin = false;
+                }
+                if ($origin) {
+                    $response->header('Access-Control-Allow-Origin', $request->header['origin']);
+                    $response->header('Access-Control-Allow-Credentials', 'true');
+                    $response->header('Access-Control-Max-Age', '3600');
+                    $response->header('Access-Control-Allow-Headers', 'Content-Type, Cookie, token, timestamp, level, signstr, identification_code');
+                    $response->header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+                }
+            }
+            if ($request->server['request_method'] == 'OPTIONS') {
+                $response->status(http_response_code());
+                $response->end();
+            } else {
+                $app = new Application($request, $response, $this->chan);
+                $app->handling();
+            }
         }
     }
 
@@ -367,19 +397,22 @@ class HttpServer extends BaseServer
     {
         // 开启websocket连接
         print_r($request);
-
+        $application = new SocketApp($this->table, $this->chan);
+        $application->open($server, $request);
     }
 
     /**
      * Message回调
-     * @param $server
-     * @param $frame
+     * @param Websocket $server
+     * @param Webframe $frame
+     * @throws \Throwable
      */
     public function WebsocketonMessage(Websocket $server, Webframe $frame)
     {
         // 执行应用并响应
         print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
-
+        $application = new SocketApp($this->table, $this->chan);
+        $application->handling($server, $frame);
     }
 
 }

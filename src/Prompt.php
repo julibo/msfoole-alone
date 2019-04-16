@@ -26,6 +26,7 @@ class Prompt
         'SYSTEM_ERROR' => ['code' => 980, 'msg' => '系统错误'],
         'LOSS_ERROR' => ['code' => 981, 'msg' => '页面丢失'],
         'OTHER_ERROR' => ['code' => 982, 'msg' => '未知错误'],
+        'OTHER_ERROR' => ['code' => 982, 'msg' => '未知错误'],
     ];
 
     public static $server = [ // 服务端异常
