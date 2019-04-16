@@ -89,6 +89,12 @@ class HttpServer extends BaseServer
     protected $health_permit;
 
     /**
+     * 健康检查开关
+     * @var bool
+     */
+    protected $health_switch = false;
+
+    /**
      * 初始化
      */
     protected function init()
@@ -100,6 +106,7 @@ class HttpServer extends BaseServer
         $config = Config::get('msfoole') ?? [];
         unset($config['host'], $config['port'], $config['ssl'], $config['option']);
         $this->config = array_merge($this->config, $config);
+        $this->health_switch = $this->config['health']['switch'] ?? false;
         $this->health_host = $this->config['health']['host'] ?? '127.0.0.1';
         $this->health_uri = $this->config['health']['uri'] ?? '/Index/Index/health';
         $this->health_permit = $this->config['health']['permit'] ?? '700040d41f47592c';
@@ -278,14 +285,14 @@ class HttpServer extends BaseServer
         // echo "worker进程启动";
         Helper::setProcessTitle("msfoole:worker-" . $this->appName);
         // step 0 健康检查
-        if ($worker_id == 0) {
+        if ($worker_id == 0 && $this->health_switch) {
             swoole_timer_tick(1000, function () use($server) {
                 $cli = new HttpClient($this->health_host, $this->port, $this->health_permit);
                 $result = $cli->get($this->health_uri);
                 if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
                     $this->counter++;
                 }
-                if ($this->counter > 30) {
+                if ($this->counter > 3) {
                     $server->shutdown();
                 }
             });

@@ -8,6 +8,7 @@ environments:
   MSFOOLE__MONITOR__SWITCH: true
   MSFOOLE__MONITOR__PATH: app/,vendor/julibo/msfoole-alone/src/
   MSFOOLE__MONITOR__INTERVAL: 3
+  MSFOOLE__HEALTH__SWITCH: false
   MSFOOLE__HEALTH__URI: /Index/Index/health
   MSFOOLE__HEALTH__HOST: 127.0.0.1
   MSFOOLE__HEALTH__PERMIT: 700040d41f47592c
