@@ -15,6 +15,7 @@ class Prompt
 {
 
     public static $common = [ // 通用异常
+        'SYSTEM_ERROR' => ['code' => 911, 'msg' => '系统错误'],
         'METHOD_NOT_EXIST' => ['code' => 998, 'msg' => '请求方法不存在'],
         'REQUEST_EXCEPTION' => ['code' => 989, 'msg' => '非法请求'],
         'SIGN_EXCEPTION' => ['code' => 988, 'msg' => '签名错误'],

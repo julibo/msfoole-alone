@@ -84,9 +84,9 @@ class Application
             throw new Exception(Prompt::$common['REQUEST_EXCEPTION']['msg'], Prompt::$common['REQUEST_EXCEPTION']['code']);
         }
         $signSrc = $header['timestamp'].$header['token'];
-        if (!empty($this->params)) {
-            ksort($this->params);
-            array_walk($this->params, function($value,$key) use (&$signSrc) {
+        if (!empty($this->httpRequest->params)) {
+            ksort($this->httpRequest->params);
+            array_walk($this->httpRequest->params, function($value,$key) use (&$signSrc) {
                 $signSrc .= $key.$value;
             });
         }

@@ -356,7 +356,7 @@ class HttpServer extends BaseServer
     public function onRequest(SwooleRequest $request, SwooleResponse $response)
     {
         // 执行应用并响应
-        // print_r($request);
+        print_r($request);
         $uri = $request->server['request_uri'];
         if ($uri == '/favicon.ico') {
             $response->status(404);
@@ -374,12 +374,12 @@ class HttpServer extends BaseServer
                     $response->header('Access-Control-Allow-Origin', $request->header['origin']);
                     $response->header('Access-Control-Allow-Credentials', 'true');
                     $response->header('Access-Control-Max-Age', '3600');
-                    $response->header('Access-Control-Allow-Headers', 'Content-Type, Cookie, token, timestamp, level, signstr, identification_code');
+                    $response->header('Access-Control-Allow-Headers', 'Content-Type, Cookie, token, timestamp, level, signer, identification');
                     $response->header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
                 }
             }
             if ($request->server['request_method'] == 'OPTIONS') {
-                $response->status(http_response_code());
+                $response->status(200);
                 $response->end();
             } else {
                 $app = new Application($request, $response, $this->chan);
