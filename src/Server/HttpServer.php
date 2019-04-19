@@ -265,7 +265,7 @@ class HttpServer extends BaseServer
      */
     public function onWorkerError(\Swoole\Server $serv, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        $error = sprintf("worker进程异常:[%d] %d 退出的状态码为%d, 退出的信号为%d", $worker_pid, $worker_id, $exit_code, $signal);
+        $error = sprintf("【%s:%s】worker进程异常:[%d] %d 退出的状态码为%d, 退出的信号为%d", $this->host, $this->port, $worker_pid, $worker_id, $exit_code, $signal);
         Helper::sendDingRobotTxt($error);
     }
 
@@ -356,7 +356,7 @@ class HttpServer extends BaseServer
     public function onRequest(SwooleRequest $request, SwooleResponse $response)
     {
         // 执行应用并响应
-        print_r($request);
+        // print_r($request);
         $uri = $request->server['request_uri'];
         if ($uri == '/favicon.ico') {
             $response->status(404);

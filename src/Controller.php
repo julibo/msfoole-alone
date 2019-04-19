@@ -51,6 +51,11 @@ abstract class Controller
     protected $token;
 
     /**
+     * @var 
+     */
+    protected $clientIP;
+
+    /**
      * AloneController constructor.
      * @param $request
      * @param $cookie
@@ -64,6 +69,7 @@ abstract class Controller
         $this->chan = $chan;
         $this->header = $this->request->getHeader();
         $this->params = $this->request->params;
+        $this->clientIP = $this->request->remote_addr;
         $this->authentication();
         $this->init();
     }
