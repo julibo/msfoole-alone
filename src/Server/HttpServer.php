@@ -356,7 +356,7 @@ class HttpServer extends BaseServer
     public function onRequest(SwooleRequest $request, SwooleResponse $response)
     {
         // 执行应用并响应
-        // print_r($request);
+        print_r($request);
         $uri = $request->server['request_uri'];
         if ($uri == '/favicon.ico') {
             $response->status(404);

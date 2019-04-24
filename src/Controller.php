@@ -107,14 +107,16 @@ abstract class Controller
      */
     final protected function authentication()
     {
+        var_dump(static::class);
         $execute = true;
         $allow = Config::get('application.allow.controller');
+        $target = '\\'. static::class;
         if (is_array($allow)) {
-            if (in_array(static::class, $allow)) {
+            if (in_array($target, $allow)) {
                 $execute = false;
             }
         } else {
-            if (static::class == $allow) {
+            if ($target == $allow) {
                 $execute = false;
             }
         }

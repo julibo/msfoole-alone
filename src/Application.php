@@ -123,11 +123,16 @@ class Application
     {
         try {
             ob_start();
-            # step 1 验证请求合法性(有令牌则不验证)
-            if (empty($this->httpRequest->getHeader('permit')) ||
-                $this->httpRequest->getHeader('permit') != Config::get('msfoole.health.permit')) {
-                $this->checkToken()->checkRequest();
+            # step 1 验证请求合法性(有令牌及白名单则不验证)
+            $allow = Config::get('application.allow.controller');
+            $target = $this->httpRequest->namespace . $this->httpRequest->controller;
+            if (!((is_array($allow) && in_array($target, $allow)) || (is_string($allow) && $allow == $target))) {
+                if (empty($this->httpRequest->getHeader('permit')) ||
+                    $this->httpRequest->getHeader('permit') != Config::get('msfoole.health.permit')) {
+                    $this->checkToken()->checkRequest();
+                }
             }
+
             # step 2 调用服务
             $this->working();
             $content = ob_get_clean();
