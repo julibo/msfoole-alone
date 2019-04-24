@@ -73,7 +73,7 @@ class Init extends Command implements Console
             ->setHelp('基于swoole4的高性能API服务框架')
             ->addArgument('action', InputArgument::REQUIRED, '执行操作：可选择值为start、stop、reload、restart')
             ->addOption('env', 'e', InputOption::VALUE_REQUIRED, '运行环境：可选值为dev、test、demo、online', 'dev')
-            ->addOption('pattern', 'p', InputOption::VALUE_NONE, '运行策略：附加websocket')
+            ->addOption('pattern', 's', InputOption::VALUE_NONE, '运行策略：附加websocket')
             ->addOption('daemon', 'd', InputOption::VALUE_NONE, '运行模式：守护模式');
     }
 
@@ -113,7 +113,9 @@ class Init extends Command implements Console
         } else {
             $this->env = $env;
         }
+
         $this->setEnvConfig($this->env);
+
         // 避免PID混乱
         $port = $this->getPort();
         Config::set('msfoole.option.pid_file', SERVER_PID . '_' .  $port);
@@ -230,7 +232,7 @@ class Init extends Command implements Console
             $this->output->writeln("<error>Server Class Must extends \\Julibo\\Msfoole\\Interfaces\\Server</error>");
             exit(230);
         }
-        $this->output->writeln("<comment>Msfoole server started: <{$host}:{$port}></comment>");
+        $this->output->writeln("<comment>Msfoole server started: <{$host}:{$port}> $this->env</comment>");
         $this->output->writeln('You can exit with <info>`CTRL-C`</info>');
         // 启动服务
         $swoole->start();

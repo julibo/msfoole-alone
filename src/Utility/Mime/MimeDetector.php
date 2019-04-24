@@ -1,19 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: runs
- * Date: 19-2-27
- * Time: 下午4:22
- * copy https://github.com/SoftCreatR/php-mime-detector
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Utility\Mime;
 
-/**
- * Class MimeDetector
- *
- * @package EasySwoole\Utility\Mime
- */
 class MimeDetector
 {
     /**

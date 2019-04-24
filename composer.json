@@ -6,7 +6,7 @@
     "msfoole-alone",
     "msfoole",
     "swoole",
-    "php框架"
+    "framework"
   ],
   "homepage": "http://msfoole.julibo.com/",
   "license": "Apache-2.0",
@@ -34,7 +34,10 @@
     "topthink/think-container": "~1.0",
     "topthink/think-helper": "~1.0"
   },
-  "require-dev" : {},
+  "require-dev" : {
+    "easyswoole/phpunit": "^1.0",
+    "easyswoole/swoole-ide-helper": "^1.2"
+  },
   "autoload": {
     "psr-4": {
       "Julibo\\Msfoole\\": "src\\"

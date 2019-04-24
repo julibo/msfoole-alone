@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 11:41 AM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Utility;
 
@@ -13,7 +16,6 @@ class File
 {
     /**
      * 创建目录
-     * @author : evalor <master@evalor.cn>
      * @param string  $dirPath     需要创建的目录
      * @param integer $permissions 目录权限
      * @return bool
@@ -35,7 +37,6 @@ class File
      * 清空一个目录
      * @param string $dirPath       需要创建的目录
      * @param bool   $keepStructure 是否保持目录结构
-     * @author : evalor <master@evalor.cn>
      * @return bool
      */
     static function cleanDirectory($dirPath, $keepStructure = false)
@@ -58,7 +59,6 @@ class File
     /**
      * 删除一个目录
      * @param $dirPath
-     * @author : evalor <master@evalor.cn>
      * @return bool
      */
     static function deleteDirectory($dirPath)
@@ -101,7 +101,6 @@ class File
      * @param string $target    目标位置
      * @param bool   $overwrite 是否覆盖目标文件
      * @return bool
-     * @author : evalor <master@evalor.cn>
      */
     static function moveDirectory($source, $target, $overwrite = true)
     {
@@ -124,7 +123,6 @@ class File
 
     /**
      * 复制文件
-     * @author : evalor <master@evalor.cn>
      * @param string $source    源位置
      * @param string $target    目标位置
      * @param bool   $overwrite 是否覆盖目标文件
@@ -146,7 +144,6 @@ class File
      * 创建一个空文件
      * @param $filePath
      * @param $overwrite
-     * @author : evalor <master@evalor.cn>
      * @return bool
      */
     static function touchFile($filePath, $overwrite = true)
@@ -175,7 +172,6 @@ class File
      * @param      $filePath
      * @param      $content
      * @param bool $overwrite
-     * @author : evalor <master@evalor.cn>
      * @return bool
      */
     static function createFile($filePath, $content, $overwrite = true)
@@ -193,7 +189,6 @@ class File
      * @param string $target    目标位置
      * @param bool   $overwrite 是否覆盖目标文件
      * @return bool
-     * @author : evalor <master@evalor.cn>
      */
     static function moveFile($source, $target, $overwrite = true)
     {
@@ -211,7 +206,6 @@ class File
      * 遍历目录
      * @param string $dirPath
      * @return array|bool
-     * @author : evalor <master@evalor.cn>
      */
     static function scanDirectory($dirPath)
     {

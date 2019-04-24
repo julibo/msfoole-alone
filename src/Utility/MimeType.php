@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 11:42 AM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Utility;
 
@@ -13,8 +16,8 @@ use Julibo\Msfoole\Utility\Mime\MimeDetector;
 class MimeType
 {
     /*
-         * 常见的拓展
-         */
+     * 常见的拓展
+     */
     const EXTENSION_MAP = [
         'audio/wav'                                                                 => '.wav',
         'audio/x-ms-wma'                                                            => '.wma',

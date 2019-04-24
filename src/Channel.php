@@ -41,7 +41,7 @@ class Channel
      * @param string $name
      * @return mixed
      */
-    public static function instance(int $capacity = 100, string $name = 'default') : self
+    public static function instance(int $capacity = 100, string $name = 'default')
     {
         if (!isset(self::$instance[$name])) {
             self::$instance[$name] = new self($capacity);

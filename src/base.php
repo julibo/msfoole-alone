@@ -42,3 +42,4 @@ $logConf = \Julibo\Msfoole\Facade\Config::get('log');
 
 // 注册错误和异常处理机制
 \Julibo\Msfoole\Error::register();
+

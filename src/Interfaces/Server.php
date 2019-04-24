@@ -126,7 +126,6 @@ abstract class Server
                 $this->swoole = new HttpServer($this->host, $this->port, $this->mode, $this->sockType);
         }
 
-
         // 设置参数
         if (!empty($this->option)) {
             $this->swoole->set($this->option);
@@ -143,7 +142,14 @@ abstract class Server
         $this->startLogic();
     }
 
+    /**
+     * @return mixed
+     */
     abstract protected function init();
 
+    /**
+     * @return mixed
+     */
     abstract protected function startLogic();
+
 }
