@@ -11,8 +11,8 @@
 
 namespace Julibo\Msfoole;
 
-use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cache;
+use Julibo\Msfoole\Component\Context\ContextManager;
 
 class Cookie
 {
@@ -63,10 +63,22 @@ class Cookie
      * @param HttpRequest $request
      * @param Response $response
      */
-    public function __construct(HttpRequest $request, Response $response)
+//    public function __construct(HttpRequest $request, Response $response)
+//    {
+//        $this->config = array_merge($this->config, Config::get('cookie'));
+//        $this->response = $response;
+//        $this->cookies = $request->getCookie();
+//        $this->header = $request->getHeader();
+//    }
+    public function init(array $config)
     {
-        $this->config = array_merge($this->config, Config::get('cookie'));
-        $this->response = $response;
+        $this->config = array_merge($this->config, $config);
+    }
+
+    private function setEnv()
+    {
+        $this->response = ContextManager::getInstance()->get('httpResponse');
+        $request = ContextManager::getInstance()->get('httpRequest');
         $this->cookies = $request->getCookie();
         $this->header = $request->getHeader();
     }
@@ -79,6 +91,7 @@ class Cookie
      */
     public function setCookie($key, $value = '', int $expire = 0)
     {
+        $this->setEnv();
         $key = $this->config['prefix'] . $key;
         if ($expire == 0) {
             $expire = $this->config['expire'] + time();
@@ -100,6 +113,7 @@ class Cookie
      */
     public function getCookie($key)
     {
+        $this->setEnv();
         $key = $this->config['prefix'] . $key;
         return $this->cookies[$key] ?? null;
     }

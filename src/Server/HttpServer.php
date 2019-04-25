@@ -20,6 +20,7 @@ use Swoole\WebSocket\Frame as Webframe;
 use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
+use Julibo\Msfoole\Facade\Cookie;
 use Julibo\Msfoole\Channel;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
@@ -315,6 +316,9 @@ class HttpServer extends BaseServer
         Log::setChan($this->chan);
         // step 3 创建协程工作池
         $this->WorkingPool();
+        // 初始化Cookie对象
+        $cookieConf = Config::get('cookie') ?? [];
+        Cookie::init($cookieConf);
     }
 
     /**
@@ -356,7 +360,7 @@ class HttpServer extends BaseServer
     public function onRequest(SwooleRequest $request, SwooleResponse $response)
     {
         // 执行应用并响应
-        print_r($request);
+        // print_r($request);
         $uri = $request->server['request_uri'];
         if ($uri == '/favicon.ico') {
             $response->status(404);
@@ -383,7 +387,7 @@ class HttpServer extends BaseServer
                 $response->status(200);
                 $response->end();
             } else {
-                $app = new Application($request, $response, $this->chan);
+                $app = new Application($request, $response);
                 $app->handling();
             }
         }

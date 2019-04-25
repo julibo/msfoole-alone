@@ -12,6 +12,7 @@
 namespace Julibo\Msfoole;
 
 use think\Log as ThinkLog;
+use Julibo\Msfoole\Component\Context\ContextManager;
 
 class Log extends ThinkLog
 {
@@ -61,16 +62,14 @@ class Log extends ThinkLog
 
     /**
      * 设置环境参数
-     * @param httpRequest $httpRequest
-     * @return $this
      */
-    public function setEnv(httpRequest $httpRequest)
+    private function setEnv()
     {
+        $httpRequest = ContextManager::getInstance()->get('httpRequest');
         $this->key = $httpRequest->identification;
         $this->method = $httpRequest->getRequestMethod();
         $this->uri = $httpRequest->getRequestUri();
         $this->ip = $httpRequest->getRemoteAddr();
-        return $this;
     }
 
     /**
@@ -154,7 +153,12 @@ class Log extends ThinkLog
         if ($key) {
             $this->key($key);
         }
-        $msg = sprintf('[ %s-%s ]  %s', $key, microtime(true), $data['msg']);
+        if ($this->config['sort']) {
+            $msg = sprintf('[ %s-%s ]  %s', $key, microtime(true), $data['msg']);
+        } else {
+            $msg = sprintf('[ %s ]  %s', $key, $data['msg']);
+        }
+
         $type = $data['type'] ?? 'info';
         $context = $data['context'] ?? [];
         $this->record($msg, $type, $context);
@@ -171,6 +175,7 @@ class Log extends ThinkLog
      */
     public function log($level, $message, array $context = [], $force = false)
     {
+        $this->setEnv();
         if ($this->chan && $force == false) {
             $this->pushRecord($message, $level, $context);
         } else {

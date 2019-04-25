@@ -12,6 +12,7 @@
 namespace Julibo\Msfoole;
 
 use Julibo\Msfoole\Facade\Config;
+use Julibo\Msfoole\Facade\Cookie;
 
 abstract class Controller
 {
@@ -19,16 +20,6 @@ abstract class Controller
      * @var HttpRequest
      */
     protected $request;
-
-    /**
-     * @var
-     */
-    protected $cookie;
-
-    /**
-     * @var Channel
-     */
-    protected $chan;
 
     /**
      * @var
@@ -58,15 +49,11 @@ abstract class Controller
     /**
      * AloneController constructor.
      * @param $request
-     * @param $cookie
-     * @param $chan
      * @throws Exception
      */
-    final public function __construct($request, $cookie, $chan)
+    final public function __construct($request)
     {
         $this->request = $request;
-        $this->cookie = $cookie;
-        $this->chan = $chan;
         $this->header = $this->request->getHeader();
         $this->params = $this->request->params;
         $this->clientIP = $this->request->remote_addr;
@@ -88,7 +75,7 @@ abstract class Controller
     {
         $this->token =  $this->header['token'] ?? null;
         if ($this->token) {
-            $this->user = $this->cookie->getTokenCache($this->token);
+            $this->user = Cookie::getTokenCache($this->token);
         }
         return $this->user;
     }
@@ -99,7 +86,7 @@ abstract class Controller
      */
     protected function setToken(array $user)
     {
-        $this->cookie->setToken($user);
+        Cookie::setToken($user);
     }
 
     /**
@@ -107,10 +94,9 @@ abstract class Controller
      */
     final protected function authentication()
     {
-        var_dump(static::class);
         $execute = true;
         $allow = Config::get('application.allow.controller');
-        $target = '\\'. static::class;
+        $target = static::class;
         if (is_array($allow)) {
             if (in_array($target, $allow)) {
                 $execute = false;

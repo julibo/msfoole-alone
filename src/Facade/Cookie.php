@@ -9,17 +9,19 @@
 // | Author: carson <yuzhanwei@aliyun.com>
 // +----------------------------------------------------------------------
 
-namespace Julibo\Msfoole\Component;
+namespace Julibo\Msfoole\Facade;
 
-trait Singleton
+use think\Facade;
+
+class Cookie extends Facade
 {
-    private static $instance;
-
-    static function getInstance(...$args)
+    /**
+     * 获取当前Facade对应类名（或者已经绑定的容器对象标识）
+     * @access protected
+     * @return string
+     */
+    protected static function getFacadeClass()
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new static(...$args);
-        }
-        return self::$instance;
+        return 'Julibo\Msfoole\Cookie';
     }
 }

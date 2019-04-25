@@ -56,7 +56,7 @@ class WebSocket
      */
     private function init()
     {
-        Log::setEnv($this->httpRequest)->info('请求开始，请求参数为 {message}', ['message' => json_encode($this->httpRequest->params)]);
+        Log::info('请求开始，请求参数为 {message}', ['message' => json_encode($this->httpRequest->params)]);
     }
 
 
@@ -197,9 +197,9 @@ class WebSocket
     {
         $executionTime = round(microtime(true) - $this->beginTime, 6) . 's';
         $consumeMem = round((memory_get_usage() - $this->beginMem) / 1024, 2) . 'K';
-        Log::setEnv($this->httpRequest)->info('请求结束，执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
+        Log::info('请求结束，执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
         if ($executionTime > Config::get('log.slow_time')) {
-            Log::setEnv($this->httpRequest)->slow('当前方法执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
+            Log::slow('当前方法执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
         }
         unset($this->chan, $this->cookie, $this->httpRequest, $this->httpResponse);
 

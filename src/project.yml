@@ -67,6 +67,7 @@ environments:
   LOG__SLOW_TIME: 3
   LOG__DEBUG: true
   LOG__RECORD_TRACE: true
+  LOG__SORT: false
 
   COOKIE__PREFIX:
   COOKIE__EXPIRE: 3600
