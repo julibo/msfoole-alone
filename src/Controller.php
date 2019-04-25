@@ -112,7 +112,7 @@ abstract class Controller
             if ($user) {
                 $this->user = $user;
             } else {
-                throw new Exception("用户认证失败", 666);
+                throw new Exception("用户认证失败", 987);
             }
         }
     }

@@ -62,7 +62,7 @@ class RedisDriver
      * @param array $config
      * @return RedisDriver
      */
-    public static function instance(array $config = []) : self
+    public static function instance(array $config = [])
     {
         $drive = md5(serialize($config));
         if (empty(self::$instance[$drive])) {
