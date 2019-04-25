@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 3:25 PM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Mysqli;
 
@@ -262,12 +265,13 @@ class DbObject
         $this->toSkip = [];
         return $id;
     }
+
     /**
      * 可选的更新数据应用于对象
      * @param null $data
      * @return bool|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function update( $data = null )
@@ -295,12 +299,13 @@ class DbObject
         $this->toSkip = [];
         return $res;
     }
+
     /**
      * 保存或更新对象
      * @param null $data
      * @return bool|int|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     public function save( $data = null )
@@ -311,11 +316,12 @@ class DbObject
             return $this->update( $data );
         }
     }
+
     /**
      * 删除的方法。只在定义了对象primaryKey时才有效
      * @return bool|null 表示成功。0或1。
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     public function delete()
@@ -346,13 +352,14 @@ class DbObject
         }
         return $this;
     }
+
     /**
      * 通过主键获取对象
      * @param string $id     主键
      * @param null   $fields 要获取的字段的数组或昏迷分隔列表
-     * @return DbObject|\EasySwoole\Mysqli\Mysqli|mixed|null|static
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @return DbObject|Mysqli|mixed|null
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     private function byId( string $id, $fields = null )
@@ -360,12 +367,13 @@ class DbObject
         $this->db->where( $this->dbTable.'.'.$this->primaryKey, $id );
         return $this->getOne( $fields );
     }
+
     /**
      * 获取一个对象。大部分会和where()在一起
      * @param null $fields
-     * @return DbObject|\EasySwoole\Mysqli\Mysqli|mixed|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @return DbObject|Mysqli|mixed|null
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function getOne( $fields = null )
@@ -392,9 +400,8 @@ class DbObject
      * @param null $limit  数组以格式数组($count， $offset)定义SQL限制，或者是条数
      * @param null $fields 要获取的字段的数组或昏迷分隔列表
      * @return array|false|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\Option
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function get( $limit = null, $fields = null )
@@ -435,7 +442,7 @@ class DbObject
      * @param string $joinType   SQL join type: LEFT, RIGHT,  INNER, OUTER
      * @return $this
      * @todo alias
-     * @throws Exceptions\JoinFail
+     * @throws Exception\JoinFail
      */
     protected function join( string $objectName, string $joinStr, string $joinType = 'LEFT' )
     {
@@ -467,8 +474,8 @@ class DbObject
     /**
      * @param string $column
      * @return array|int|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function count( string $column = '*' )
@@ -479,8 +486,8 @@ class DbObject
     /**
      * @param string $name
      * @return array
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function column( string $name )
@@ -490,8 +497,8 @@ class DbObject
     /**
      * @param string $name
      * @return array|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function value( string $name )
@@ -501,8 +508,8 @@ class DbObject
     /**
      * @param $filedName
      * @return array|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function sum( $filedName )
@@ -512,8 +519,8 @@ class DbObject
     /**
      * @param $filedName
      * @return mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function max( $filedName )
@@ -523,8 +530,8 @@ class DbObject
     /**
      * @param $filedName
      * @return mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function min( $filedName )
@@ -534,8 +541,8 @@ class DbObject
     /**
      * @param $filedName
      * @return mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function avg( $filedName )
@@ -562,8 +569,8 @@ class DbObject
      * @param     $filedName
      * @param int $num
      * @return mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function setInc( $filedName, $num = 1 )
@@ -574,8 +581,8 @@ class DbObject
      * @param     $filedName
      * @param int $num
      * @return mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function setDec( $filedName, $num = 1 )
@@ -585,8 +592,8 @@ class DbObject
     /**
      * @param array $insertData
      * @return bool|int|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function replace( array $insertData )
@@ -735,9 +742,11 @@ class DbObject
             $this->_with = [];
         }
     }
+
     /**
      * 函数构建对于get/getOne方法有一个连接
-     * @throws Exceptions\Option
+     * @throws Exception\JoinFail
+     * @throws Exception\Option
      */
     private function processHasOneWith() : void
     {
@@ -787,7 +796,7 @@ class DbObject
     }
     /**
      * @return $this
-     * @throws Exceptions\Option
+     * @throws Exception\Option
      */
     public function withTotalCount()
     {
@@ -804,7 +813,7 @@ class DbObject
     /** 设置额外查询参数
      * @param mixed $options $options 查询参数 可传入数组设置多个
      * @return $this
-     * @throws Exceptions\Option
+     * @throws Exception\Option
      */
     public function setQueryOption( $options )
     {
@@ -815,8 +824,8 @@ class DbObject
      * @param       $query
      * @param array $bindParams
      * @return $this
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      */
     public function rawQuery( $query, array $bindParams = [] )
     {

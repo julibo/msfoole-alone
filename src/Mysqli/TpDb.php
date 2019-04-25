@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 3:24 PM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Mysqli;
 
@@ -61,8 +64,10 @@ class TpDb
      * @var string
      */
     protected $primaryKey = 'id';
+
     /**
      * @param string $name
+     * @return $this
      */
     protected function name( string $name )
     {
@@ -103,12 +108,13 @@ class TpDb
     {
         return $this->db;
     }
+
     /**
-     * @param string | array $objectNames
-     * @param string         $joinStr
-     * @param string         $joinType
-     * @return TpDb
-     * @throws \EasySwoole\Mysqli\Exceptions\JoinFail
+     * @param $objectNames
+     * @param string|null $joinStr
+     * @param string $joinType
+     * @return $this
+     * @throws Exception\JoinFail
      */
     protected function join( $objectNames, string $joinStr = null, string $joinType = 'LEFT' )
     {
@@ -121,13 +127,13 @@ class TpDb
         }
         return $this;
     }
+
     /**
-     * 将对象连接到另一个对象
-     * @param string $objectName 对象名称
-     * @param string $joinStr    关联天条件字符串
-     * @param string $joinType   SQL join type: LEFT, RIGHT,  INNER, OUTER
+     * @param string $objectName
+     * @param string $joinStr
+     * @param string $joinType
      * @return $this
-     * @throws Exceptions\JoinFail
+     * @throws Exception\JoinFail
      */
     protected function _join( string $objectName, string $joinStr, string $joinType = 'LEFT' )
     {
@@ -166,12 +172,13 @@ class TpDb
         $this->limit( [$page, $rows] );
         return $this;
     }
+
     /**
      * @param null $limit
      * @param null $fields
      * @return Mysqli|mixed|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     private function get( $limit = null, $fields = null )
@@ -182,10 +189,11 @@ class TpDb
         }
         return $results;
     }
+
     /**
      * @return array
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function find()
@@ -193,11 +201,11 @@ class TpDb
         $list = $this->get( 1, $this->fields );
         return isset( $list[0] ) ? $list[0] : [];
     }
+
     /**
-     * @return array |false| null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\Option
-     * @throws Exceptions\PrepareQueryFail
+     * @return Mysqli|mixed|null
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function select()
@@ -229,10 +237,11 @@ class TpDb
         }
         return $this;
     }
+
     /**
      * @return array|int|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function count()
@@ -240,23 +249,24 @@ class TpDb
         $res = $this->db->getValue( $this->dbTable, "count(*)" );
         return $res ?? 0;
     }
+
     /**
      * @param array $data
-     * @return bool|int|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @return bool|int
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function insert( $data = [] )
     {
         return $this->getDb()->insert( $this->dbTable, $data );
     }
+
     /**
-     * 可选的更新数据应用于对象
-     * @param null $data
+     * @param array $data
      * @return bool|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function update( $data = [] )
@@ -270,10 +280,11 @@ class TpDb
         $this->isWhere = false;
         return $this->getDb()->update( $this->dbTable, $data );
     }
+
     /**
      * @return bool|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function delete()
@@ -287,12 +298,13 @@ class TpDb
         $this->isWhere = false;
         return $this->getDb()->delete( $this->dbTable );
     }
+
     /**
      * @param string $orderByField
      * @param string $orderByDirection
-     * @param null   $customFieldsOrRegExp
+     * @param null $customFieldsOrRegExp
      * @return $this
-     * @throws Exceptions\OrderByFail
+     * @throws Exception\OrderByFail
      */
     protected function order( string $orderByField, string $orderByDirection = "DESC", $customFieldsOrRegExp = null )
     {
@@ -323,22 +335,24 @@ class TpDb
         }
         return $this;
     }
+
     /**
      * @param string $name
      * @return array
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function column( string $name )
     {
         return $this->getDb()->getColumn( $this->dbTable, $name );
     }
+
     /**
      * @param string $name
      * @return array|null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function value( string $name )

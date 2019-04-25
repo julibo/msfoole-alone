@@ -1,7 +1,13 @@
 <?php
-/**
- * Mysqli基类
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Mysqli;
 
@@ -536,7 +542,7 @@ class Mysqli
             return null;
         }
         $newRes = Array();
-        for ($i = 0; $i < $this->affectRows; $i++) {
+        for ($i = 0; $i < $limit; $i++) {
             $newRes[] = $res[$i]['retval'];
         }
         return $newRes;
@@ -878,6 +884,7 @@ class Mysqli
     {
         return array("[I]" => "-" . $num);
     }
+
     /**
      * 自增某个字段
      * @param string $tableName 表名称
@@ -886,12 +893,13 @@ class Mysqli
      * @return mixed
      * @throws ConnectFail 链接失败时请外部捕获该异常进行处理
      * @throws PrepareQueryFail
-     * @TODO set inc after lock some line
+     * @throws \Throwable
      */
     public function setInc($tableName, $filedName, $num = 1)
     {
         return $this->update($tableName, [ $filedName => $this->inc($num) ]);
     }
+
     /**
      * 自减某个字段
      * @param string $tableName 表名称
@@ -900,7 +908,7 @@ class Mysqli
      * @return mixed
      * @throws ConnectFail 链接失败时请外部捕获该异常进行处理
      * @throws PrepareQueryFail
-     * @TODO set dec after lock some line
+     * @throws \Throwable
      */
     public function setDec($tableName, $filedName, $num = 1)
     {
@@ -1424,11 +1432,13 @@ class Mysqli
         $newStr .= $str;
         return $newStr;
     }
+
     /**
      * 生成预查询对象Statement
-     * @return Statement
+     * @return mixed
      * @throws ConnectFail
      * @throws PrepareQueryFail
+     * @throws \Throwable
      */
     private function prepareQuery()
     {

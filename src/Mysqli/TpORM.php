@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 3:26 PM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Mysqli;
 
@@ -70,12 +73,13 @@ class TpORM extends DbObject
     {
         return $this->tableName;
     }
+
     /**
-     * @param string | array $objectNames
-     * @param string         $joinStr
-     * @param string         $joinType
-     * @todo alias
-     * @throws \EasySwoole\Mysqli\Exceptions\JoinFail
+     * @param string $objectNames
+     * @param string|null $joinStr
+     * @param string $joinType
+     * @return $this|DbObject
+     * @throws Exception\JoinFail
      */
     protected function join( $objectNames, string $joinStr = null, string $joinType = 'LEFT' )
     {
@@ -92,9 +96,8 @@ class TpORM extends DbObject
     }
     /**
      * @return array
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\Option
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function find()
@@ -136,7 +139,7 @@ class TpORM extends DbObject
      * @param string $orderByDirection
      * @param null   $customFieldsOrRegExp
      * @return $this
-     * @throws Exceptions\OrderByFail
+     * @throws Exception\OrderByFail
      */
     protected function order( string $orderByField, string $orderByDirection = "DESC", $customFieldsOrRegExp = null )
     {
@@ -169,9 +172,8 @@ class TpORM extends DbObject
     }
     /**
      * @return array |false| null
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\Option
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     protected function select()
@@ -211,8 +213,8 @@ class TpORM extends DbObject
      * @param null $data
      * @todo 过滤的方法加到DbObject里
      * @return bool|int|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     public function insert( $data = null )
@@ -235,8 +237,8 @@ class TpORM extends DbObject
      * 如果不存在
      * @param null $data
      * @return bool|mixed
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     public function update( $data = null )
@@ -283,8 +285,8 @@ class TpORM extends DbObject
     /**
      * 删除的方法。只在定义了对象primaryKey时才有效
      * @return bool|null 表示成功。0或1。
-     * @throws Exceptions\ConnectFail
-     * @throws Exceptions\PrepareQueryFail
+     * @throws Exception\ConnectFail
+     * @throws Exception\PrepareQueryFail
      * @throws \Throwable
      */
     public function delete()
