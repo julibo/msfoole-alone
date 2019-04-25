@@ -50,47 +50,6 @@ class PoolManager
         }
     }
 
-    function registerAnonymous(string $name,?callable $createCall = null)
-    {
-        /*
-         * 绕过去实现动态class
-         */
-        $class = 'C'.Random::character(16);
-        $classContent = '<?php
-        class '.$class.' extends \EasySwoole\Component\Pool\AbstractPool {
-            private $call;
-            function __construct($conf,$call)
-            {
-                $this->call = $call;
-                parent::__construct($conf);
-            }
-
-            protected function createObject()
-            {
-                // TODO: Implement createObject() method.
-                return call_user_func($this->call);
-            }
-        }';
-        $file = sys_get_temp_dir()."/{$class}.php";
-        file_put_contents($file,$classContent);
-        require_once $file;
-        unlink($file);
-        if(!is_callable($createCall)){
-            if(class_exists($name)){
-                $createCall = function ()use($name){
-                    return new $name;
-                };
-            }else{
-                return false;
-            }
-        }
-        $this->pool[$name] = [
-            'class'=>$class,
-            'call'=>$createCall,
-        ];
-        return true;
-    }
-
     /*
      * 请在进程克隆后，也就是worker start后，每个进程中独立使用
      */

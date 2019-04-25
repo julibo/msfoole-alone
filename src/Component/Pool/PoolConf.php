@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: carson
- * Date: 2019/4/24
- * Time: 4:16 PM
- */
+// +----------------------------------------------------------------------
+// | msfoole [ 基于swoole4的高性能API服务框架 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2018 http://julibo.com All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: carson <yuzhanwei@aliyun.com>
+// +----------------------------------------------------------------------
 
 namespace Julibo\Msfoole\Component\Pool;
 
@@ -12,12 +15,34 @@ use Julibo\Msfoole\Component\Pool\Exception\PoolObjectNumError;
 
 class PoolConf
 {
+    /**
+     * @var float|int
+     */
     protected $intervalCheckTime = 30*1000;
+
+    /**
+     * @var int
+     */
     protected $maxIdleTime = 15;
+
+    /**
+     * @var int
+     */
     protected $maxObjectNum = 20;
+
+    /**
+     * @var int
+     */
     protected $minObjectNum = 5;
+
+    /**
+     * @var float
+     */
     protected $getObjectTimeout = 3.0;
 
+    /**
+     * @var array
+     */
     protected $extraConf = [];
 
     /**
@@ -125,4 +150,5 @@ class PoolConf
         $this->minObjectNum = $minObjectNum;
         return $this;
     }
+
 }
