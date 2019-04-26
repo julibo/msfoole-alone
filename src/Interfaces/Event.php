@@ -16,7 +16,7 @@ use Swoole\Http\Response;
 
 interface Event
 {
-    public static function initialize();
+    public static function init();
 
     public static function onWorkerStart();
 

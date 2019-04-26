@@ -122,6 +122,23 @@ class HttpServer extends BaseServer
         if ($this->pattern) {
             $this->serverType = 'socket';
         }
+        // 事件注入
+        $event = $this->invokeEvent();
+        if ($event) {
+            $event::init();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function invokeEvent()
+    {
+        if (defined('MSFOOLE_EVENT') && in_array("Julibo\Msfoole\Interfaces\Event", class_implements(MSFOOLE_EVENT))) {
+            return MSFOOLE_EVENT;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -319,6 +336,11 @@ class HttpServer extends BaseServer
         // 初始化Cookie对象
         $cookieConf = Config::get('cookie') ?? [];
         Cookie::init($cookieConf);
+        // 事件注入
+        $event = $this->invokeEvent();
+        if ($event) {
+            $event::onWorkerStart();
+        }
     }
 
     /**
@@ -361,6 +383,11 @@ class HttpServer extends BaseServer
     {
         // 执行应用并响应
         // print_r($request);
+        // 事件注入
+        $event = $this->invokeEvent();
+        if ($event) {
+            $event::onRequest($request, $response);
+        }
         $uri = $request->server['request_uri'];
         if ($uri == '/favicon.ico') {
             $response->status(404);
@@ -389,6 +416,9 @@ class HttpServer extends BaseServer
             } else {
                 $app = new Application($request, $response);
                 $app->handling();
+            }
+            if ($event) {
+                $event::afterRequest($request, $response);
             }
         }
     }

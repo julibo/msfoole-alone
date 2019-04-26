@@ -313,7 +313,7 @@ abstract class AbstractPool
             if($pool instanceof self){
                 $obj = $pool->getObj($timeout);
                 if ($obj) {
-                    Coroutine::defer(function ()use($pool, $obj){
+                    Coroutine::defer(function ()use($pool, $obj) {
                         $pool->recycleObj($obj);
                     });
                     ContextManager::getInstance()->set($key, $obj);
