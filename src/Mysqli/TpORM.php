@@ -41,6 +41,7 @@ class TpORM extends DbObject
      * @var array | int
      */
     protected $limit;
+
     public function __construct( $data = null )
     {
         if( empty( $this->dbTable ) ){

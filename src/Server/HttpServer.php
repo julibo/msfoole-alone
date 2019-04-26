@@ -103,10 +103,16 @@ class HttpServer extends BaseServer
     protected $health_limit = 10;
 
     /**
+     * @var
+     */
+    protected $website;
+
+    /**
      * 初始化
      */
     protected function init()
     {
+        $this->website = current(swoole_get_local_ip()) ?: $this->host;
         $this->appName = Config::get('application.name') ?? '';
         $this->option['upload_tmp_dir'] = TEMP_PATH;
         $this->option['http_parse_post'] = true;
@@ -229,7 +235,7 @@ class HttpServer extends BaseServer
     public function onShutdown(\Swoole\Server $server)
     {
         // echo "主进程结束";
-        $tips = sprintf("【%s:%s】主进程结束", $this->host, $this->port);
+        $tips = sprintf("【%s:%s:%s】主进程结束", $this->appName, $this->website, $this->port);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -248,7 +254,7 @@ class HttpServer extends BaseServer
     public function onManagerStop(\Swoole\Server $server)
     {
         // echo "管理进程停止";
-        $tips = sprintf("【%s:%s】管理进程停止", $this->host, $this->port);
+        $tips = sprintf("【%s:%s:%s】管理进程停止", $this->appName, $this->website, $this->port);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -259,7 +265,7 @@ class HttpServer extends BaseServer
     public function onWorkerStop(\Swoole\Server $server, int $worker_id)
     {
         // echo "worker进程终止";
-        $tips = sprintf("【%s:%s】worker进程终止", $this->host, $this->port);
+        $tips = sprintf("【%s:%s:%s】worker进程终止", $this->appName, $this->website, $this->port);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -270,7 +276,7 @@ class HttpServer extends BaseServer
     public function onWorkerExit(\Swoole\Server $server, int $worker_id)
     {
         // echo "worker进程退出";
-        $tips = sprintf("【%s:%s】worker进程退出", $this->host, $this->port);
+        $tips = sprintf("【%s:%s:%s】worker进程退出", $this->appName, $this->host, $this->port);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -283,7 +289,7 @@ class HttpServer extends BaseServer
      */
     public function onWorkerError(\Swoole\Server $serv, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        $error = sprintf("【%s:%s】worker进程异常:[%d] %d 退出的状态码为%d, 退出的信号为%d", $this->host, $this->port, $worker_pid, $worker_id, $exit_code, $signal);
+        $error = sprintf("【%s:%s:%s】worker进程异常:[%d] %d 退出的状态码为%d, 退出的信号为%d", $this->appName, $this->website, $this->port, $worker_pid, $worker_id, $exit_code, $signal);
         Helper::sendDingRobotTxt($error);
     }
 
