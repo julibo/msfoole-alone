@@ -11,9 +11,11 @@
 
 namespace Julibo\Msfoole\Component\Pool;
 
+use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
 use Julibo\Msfoole\Utility\Random;
 use Julibo\Msfoole\Component\Pool\Exception\PoolObjectNumError;
+use Julibo\Msfoole\Component\Context\ContextManager;
 
 abstract class AbstractPool
 {
@@ -298,6 +300,31 @@ abstract class AbstractPool
             'max' => $this->getPoolConfig()->getMaxObjectNum(),
             'min' => $this->getPoolConfig()->getMinObjectNum()
         ];
+    }
+
+    public static function defer($timeout = null)
+    {
+        $key = md5(static::class);
+        $obj = ContextManager::getInstance()->get($key);
+        if ($obj) {
+            return $obj;
+        }else{
+            $pool = PoolManager::getInstance()->getPool(static::class);
+            if($pool instanceof self){
+                $obj = $pool->getObj($timeout);
+                if ($obj) {
+                    Coroutine::defer(function ()use($pool, $obj){
+                        $pool->recycleObj($obj);
+                    });
+                    ContextManager::getInstance()->set($key, $obj);
+                    return $obj;
+                }else{
+                    throw new PoolEmpty(static::class." pool is empty");
+                }
+            }else{
+                throw new PoolException(static::class." convert to pool error");
+            }
+        }
     }
 
 }
