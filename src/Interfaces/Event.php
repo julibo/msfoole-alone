@@ -9,16 +9,18 @@
 // | Author: carson <yuzhanwei@aliyun.com>
 // +----------------------------------------------------------------------
 
-namespace Julibo\Msfoole\Component\Pool;
+namespace Julibo\Msfoole\Interfaces;
 
-interface PoolObjectInterface
+use Swoole\Http\Request;
+use Swoole\Http\Response;
+
+interface Event
 {
-    //unset 的时候执行
-    public function gc();
+    public static function initialize();
 
-    //使用后,free的时候会执行
-    public function objectRestore();
+    public static function onWorkerStart();
 
-    //使用前调用,当返回true，表示该对象可用。返回false，该对象失效，需要回收
-    public function beforeUse():bool ;
+    public static function onRequest(Request $request,Response $response) : bool ;
+
+    public static function afterRequest(Request $request,Response $response) : void;
 }
