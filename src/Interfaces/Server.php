@@ -83,6 +83,12 @@ abstract class Server
     protected $pattern = false;
 
     /**
+     * 运行环境
+     * @var string
+     */
+    protected $env = 'dev';
+
+    /**
      * 魔术方法，有不存在的操作时候执行
      * @param $method
      * @param $args
@@ -99,9 +105,10 @@ abstract class Server
      * @param $mode
      * @param $sockType
      * @param array $option
+     * @param string $env
      * @param bool $pattern
      */
-    final public function __construct($host, $port, $mode, $sockType, $option = [], $pattern = false)
+    final public function __construct($host, $port, $mode, $sockType, $option = [], $env = 'dev', $pattern = false)
     {
         $this->lastMtime = time();
         $this->host = $host;
@@ -110,6 +117,11 @@ abstract class Server
         $this->sockType = $sockType;
         $this->option = $option;
         $this->pattern = $pattern;
+        $this->env = $env;
+
+        if ($this->pattern) {
+            $this->serverType = 'socket';
+        }
 
         // 初始化
         $this->init();
@@ -124,6 +136,7 @@ abstract class Server
                 break;
             default:
                 $this->swoole = new HttpServer($this->host, $this->port, $this->mode, $this->sockType);
+                break;
         }
 
         // 设置参数

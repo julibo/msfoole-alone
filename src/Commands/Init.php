@@ -114,21 +114,21 @@ class Init extends Command implements Console
             $this->env = $env;
         }
 
-        $this->setEnvConfig($this->env);
-
-        // 避免PID混乱
-        $port = $this->getPort();
-        Config::set('msfoole.option.pid_file', SERVER_PID . '_' .  $port);
-        Config::set('msfoole.option.daemonize', $this->daemon);
-        Config::set('msfoole.option.log_file', LOG_PATH . ($option['log_file'] ?? 'msfoole.log'));
-        Config::set('msfoole.option.request_slowlog_file',  LOG_PATH . ($option['request_slowlog_file'] ?? 'trace.log'));
-
         if (!file_exists(LOG_PATH)) {
             mkdir(LOG_PATH, 0777, true);
         }
         if (!file_exists(TEMP_PATH)) {
             mkdir(TEMP_PATH, 0777, true);
         }
+
+        $this->setEnvConfig($this->env);
+
+        // 避免PID混乱
+        $port = $this->getPort();
+        Config::set('msfoole.option.pid_file', SERVER_PID . '_' .  $port);
+        Config::set('msfoole.option.daemonize', $this->daemon);
+        Config::set('msfoole.option.log_file', LOG_PATH . (Config::get('msfoole.option.log_file') ?? 'msfoole.log'));
+        Config::set('msfoole.option.request_slowlog_file',  LOG_PATH . (Config::get('msfoole.option.request_slowlog_file') ?? 'trace.log'));
     }
 
     /**
@@ -227,7 +227,7 @@ class Init extends Command implements Console
             $this->output->writeln("<error>Server Class Not Exists : {$swooleClass}</error>");
             exit(220);
         }
-        $swoole = new $swooleClass($host, $port, $mode, $type, $option, $this->pattern);
+        $swoole = new $swooleClass($host, $port, $mode, $type, $option, $this->env, $this->pattern);
         if (!$swoole instanceof SwooleServer) {
             $this->output->writeln("<error>Server Class Must extends \\Julibo\\Msfoole\\Interfaces\\Server</error>");
             exit(230);

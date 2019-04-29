@@ -59,7 +59,6 @@ class Error
         if (!$e instanceof \Exception) {
             $e = new ThrowableError($e);
         }
-
         self::getExceptionHandler()->report($e);
         if (Config::get('application.debug')) {
             self::getExceptionHandler()->renderForConsole($e);

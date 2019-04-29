@@ -22,6 +22,7 @@ use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Cookie;
 use Julibo\Msfoole\Channel;
+use Julibo\Msfoole\Error;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
@@ -86,11 +87,6 @@ class HttpServer extends BaseServer
     protected $health_uri;
 
     /**
-     * @var 健康检查许可证
-     */
-    protected $health_permit;
-
-    /**
      * 健康检查开关
      * @var bool
      */
@@ -123,12 +119,8 @@ class HttpServer extends BaseServer
         $this->health_switch = $this->config['health']['switch'] ?? false;
         $this->health_host = $this->config['health']['host'] ?? '127.0.0.1';
         $this->health_uri = $this->config['health']['uri'] ?? '/Index/Index/health';
-        $this->health_permit = $this->config['health']['permit'] ?? '700040d41f47592c';
         $this->health_limit = $this->config['health']['limit'] ?? 10;
-        if ($this->pattern) {
-            $this->serverType = 'socket';
-        }
-        // 事件注入
+        // 初始化事件注入
         $event = $this->invokeEvent();
         if ($event) {
             $event::init();
@@ -152,9 +144,6 @@ class HttpServer extends BaseServer
      */
     protected function startLogic()
     {
-        # 初始化缓存
-        $cacheConfig = Config::get('cache.default') ?? [];
-        Cache::init($cacheConfig);
         # 开启异步定时监控
         $this->monitorProcess();
         # 创建客户端连接内存表
@@ -172,7 +161,7 @@ class HttpServer extends BaseServer
             $this->table->column('counter', table::TYPE_INT, 4); // 计数器
             $this->table->column('create_time', table::TYPE_INT, 4); // 创建时间戳
             $this->table->column('update_time', table::TYPE_INT, 4); // 更新时间戳
-            $this->table->column('user', table::TYPE_STRING, 1024); // 用户信息描述
+            $this->table->column('user', table::TYPE_STRING, 2048); // 用户信息描述
             $this->table->create();
         }
     }
@@ -203,7 +192,8 @@ class HttpServer extends BaseServer
                         $dir      = new \RecursiveDirectoryIterator($path);
                         $iterator = new \RecursiveIteratorIterator($dir);
                         foreach ($iterator as $file) {
-                            if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
+                            if (pathinfo($file, PATHINFO_EXTENSION) != 'php' && pathinfo($file, PATHINFO_EXTENSION) != 'ini'
+                                && pathinfo($file, PATHINFO_EXTENSION) != 'yml' ) {
                                 continue;
                             }
                             if ($this->lastMtime < $file->getMTime()) {
@@ -319,7 +309,7 @@ class HttpServer extends BaseServer
         // step 0 健康检查
         if ($worker_id == 0 && $this->health_switch) {
             swoole_timer_tick(1000, function () use($server) {
-                $cli = new HttpClient($this->health_host, $this->port, $this->health_permit);
+                $cli = new HttpClient($this->health_host, $this->port);
                 $result = $cli->get($this->health_uri);
                 if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
                     $this->counter++;
@@ -331,21 +321,50 @@ class HttpServer extends BaseServer
                 }
             });
         }
+        $this->startingWorker();
+    }
+
+    /**
+     * 工作进程启动
+     */
+    private function startingWorker()
+    {
+        // step 0 初始化配置
+        $this->resetConfig();
         // step 1 创建通道
         $chanConfig = $this->config['channel'];
         $capacity = $chanConfig['capacity'] ?? 100;
         $this->chan = Channel::instance($capacity);
-        // step 2 开启日志通道
-        Log::setChan($this->chan);
-        // step 3 创建协程工作池
+        // step 2 初始化日志
+        Log::launch(Config::get('log'), $this->chan);
+        // step 3 注册错误和异常处理机制
+        Error::register();
+        // step 4 创建协程工作池
         $this->WorkingPool();
-        // 初始化Cookie对象
+        // step 5 初始化缓存
+        $cacheConfig = Config::get('cache.default') ?? [];
+        Cache::init($cacheConfig);
+        // step 6 初始化Cookie对象
         $cookieConf = Config::get('cookie') ?? [];
         Cookie::init($cookieConf);
         // 事件注入
         $event = $this->invokeEvent();
         if ($event) {
             $event::onWorkerStart();
+        }
+    }
+
+    /**
+     * 重新初始化配置
+     */
+    private function resetConfig()
+    {
+        Config::reset();
+        Config::loadFile(dirname(__DIR__) . '/project.yml', ENV_EXT);
+        Config::loadConfig(CONF_PATH, CONF_EXT);
+        $file = CONF_PATH . 'php-' . strtolower($this->env) . ENV_EXT;
+        if (file_exists($file)) {
+            Config::loadFile($file, ENV_EXT);
         }
     }
 
@@ -422,9 +441,9 @@ class HttpServer extends BaseServer
             } else {
                 $app = new Application($request, $response);
                 $app->handling();
-            }
-            if ($event) {
-                $event::afterRequest($request, $response);
+                if ($event) {
+                    $event::afterRequest($request, $response);
+                }
             }
         }
     }
