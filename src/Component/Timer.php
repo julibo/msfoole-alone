@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Component;
 
-
 class Timer
 {
     use Singleton;

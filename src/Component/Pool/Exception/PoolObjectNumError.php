@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Component\Pool\Exception;
 
-
 class PoolObjectNumError extends PoolException
 {
 

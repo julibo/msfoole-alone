@@ -199,7 +199,8 @@ class SplString extends SplStream
 
     /**
      * 转为蛇的样子
-     * @param  string $delimiter
+     * @param string $delimiter
+     * @return SplString
      */
     function snake( string $delimiter = '_' ) : SplString
     {
@@ -236,8 +237,10 @@ class SplString extends SplStream
 
     /**
      * 用数组逐个字符
-     * @param  string $search
-     * @param  array  $replace
+     *
+     * @param string $search
+     * @param array $replace
+     * @return SplString
      */
     public function replaceArray( string $search, array $replace ) : SplString
     {
@@ -249,8 +252,9 @@ class SplString extends SplStream
 
     /**
      * 替换字符串中给定值的第一次出现。
-     * @param  string $search
-     * @param  string $replace
+     * @param string $search
+     * @param string $replace
+     * @return SplString
      */
     public function replaceFirst( string $search, string $replace ) : SplString
     {
@@ -269,8 +273,10 @@ class SplString extends SplStream
 
     /**
      * 替换字符串中给定值的最后一次出现。
-     * @param  string $search
-     * @param  string $replace
+     *
+     * @param string $search
+     * @param string $replace
+     * @return SplString
      */
     public function replaceLast( string $search, string $replace ) : SplString
     {
@@ -286,7 +292,8 @@ class SplString extends SplStream
     /**
      * 以一个给定值的单一实例开始一个字符串
      *
-     * @param  string $prefix
+     * @param string $prefix
+     * @return SplString
      */
     public function start( string $prefix ) : SplString
     {
@@ -297,7 +304,8 @@ class SplString extends SplStream
     /**
      * 在给定的值之后返回字符串的其余部分。
      *
-     * @param  string $search
+     * @param string $search
+     * @return SplString
      */
     function after( string $search ) : SplString
     {
@@ -311,7 +319,8 @@ class SplString extends SplStream
     /**
      * 在给定的值之前获取字符串的一部分
      *
-     * @param  string $search
+     * @param string $search
+     * @return SplString
      */
     function before( string $search ) : SplString
     {
@@ -325,8 +334,7 @@ class SplString extends SplStream
     /**
      * 确定给定的字符串是否以给定的子字符串结束
      *
-     * @param  string       $haystack
-     * @param  string|array $needles
+     * @param $needles
      * @return bool
      */
     public function endsWith( $needles ) : bool
@@ -342,8 +350,7 @@ class SplString extends SplStream
     /**
      * 确定给定的字符串是否从给定的子字符串开始
      *
-     * @param  string       $haystack
-     * @param  string|array $needles
+     * @param $needles
      * @return bool
      */
     public function startsWith( $needles ) : bool

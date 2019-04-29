@@ -124,7 +124,6 @@ class Application
                     $this->checkToken()->checkRequest();
                 }
             }
-
             # step 2 调用服务
             $this->working();
             $content = ob_get_clean();

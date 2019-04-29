@@ -60,21 +60,16 @@ class Cookie
 
     /**
      * 初始化
-     * @param HttpRequest $request
-     * @param Response $response
+     * @param array $config
      */
-//    public function __construct(HttpRequest $request, Response $response)
-//    {
-//        $this->config = array_merge($this->config, Config::get('cookie'));
-//        $this->response = $response;
-//        $this->cookies = $request->getCookie();
-//        $this->header = $request->getHeader();
-//    }
     public function init(array $config)
     {
         $this->config = array_merge($this->config, $config);
     }
 
+    /**
+     * 设置当前环境
+     */
     private function setEnv()
     {
         $this->response = ContextManager::getInstance()->get('httpResponse');

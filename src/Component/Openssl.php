@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Component;
 
-
 class Openssl
 {
     private $key;

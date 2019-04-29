@@ -15,7 +15,6 @@ use Swoole\Coroutine;
 use Julibo\Msfoole\Component\Context\Exception\ModifyError;
 use Julibo\Msfoole\Component\Singleton;
 
-
 class ContextManager
 {
     use Singleton;
@@ -62,7 +61,6 @@ class ContextManager
         $cid = $this->getCid($cid);
         if(isset($this->context[$cid][$key])){
             if(isset($this->contextHandler[$key])){
-                /** @var ContextItemHandlerInterface $handler */
                 $handler = $this->contextHandler[$key];
                 $item = $this->context[$cid][$key];
                 unset($this->context[$cid][$key]);

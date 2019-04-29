@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Utility;
 
-
 class Str
 {
     /**

@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Validate;
 
-
 class Validate
 {
     protected $columns = [];

@@ -265,8 +265,8 @@ class HttpServer extends BaseServer
      */
     public function onWorkerExit(\Swoole\Server $server, int $worker_id)
     {
-        // echo "worker进程退出";
-        $tips = sprintf("【%s:%s:%s】worker进程退出", $this->appName, $this->host, $this->port);
+        echo "worker进程退出";
+        $tips = sprintf("【%s:%s:%s:%s】worker进程退出", $this->appName, $this->host, $this->port, $worker_id);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -308,7 +308,7 @@ class HttpServer extends BaseServer
         Helper::setProcessTitle("msfoole:worker-" . $this->appName);
         // step 0 健康检查
         if ($worker_id == 0 && $this->health_switch) {
-            swoole_timer_tick(1000, function () use($server) {
+            swoole_timer_tick(10000, function () use($server) {
                 $cli = new HttpClient($this->health_host, $this->port);
                 $result = $cli->get($this->health_uri);
                 if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {

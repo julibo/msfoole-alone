@@ -11,7 +11,6 @@
 
 namespace Julibo\Msfoole\Utility;
 
-
 class ArrayToTextTable
 {
     const AlignLeft   = STR_PAD_RIGHT;
