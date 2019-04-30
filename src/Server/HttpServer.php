@@ -304,24 +304,28 @@ class HttpServer extends BaseServer
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        // echo "worker进程启动";
-        Helper::setProcessTitle("msfoole:worker-" . $this->appName);
-        // step 0 健康检查
-        if ($worker_id == 0 && $this->health_switch) {
-            swoole_timer_tick(10000, function () use($server) {
-                $cli = new HttpClient($this->health_host, $this->port);
-                $result = $cli->get($this->health_uri);
-                if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
-                    $this->counter++;
-                } else {
-                    $this->counter = 0;
-                }
-                if ($this->counter > $this->health_limit) {
-                    $server->shutdown();
-                }
-            });
+        try {
+            // echo "worker进程启动";
+            Helper::setProcessTitle("msfoole:worker-" . $this->appName);
+            // step 0 健康检查
+            if ($worker_id == 0 && $this->health_switch) {
+                swoole_timer_tick(10000, function () use($server) {
+                    $cli = new HttpClient($this->health_host, $this->port);
+                    $result = $cli->get($this->health_uri);
+                    if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
+                        $this->counter++;
+                    } else {
+                        $this->counter = 0;
+                    }
+                    if ($this->counter > $this->health_limit) {
+                        $server->shutdown();
+                    }
+                });
+            }
+            $this->startingWorker();
+        } catch (\Throwable $e) {
+            # todo worker异常处理
         }
-        $this->startingWorker();
     }
 
     /**

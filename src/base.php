@@ -36,3 +36,5 @@ require ROOT_PATH . 'vendor/autoload.php';
 // 配置文件解析
 \Julibo\Msfoole\Facade\Config::loadConfig(CONF_PATH, CONF_EXT);
 
+// 注册异常处理
+\Julibo\Msfoole\Error::register();

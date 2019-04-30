@@ -15,7 +15,6 @@ use Exception;
 use Chency147\CliMessage\Message;
 use Chency147\CliMessage\Style;
 use Julibo\Msfoole\Facade\Config;
-use Julibo\Msfoole\Facade\Log;
 
 class Handle
 {
@@ -47,26 +46,21 @@ class Handle
     public function report(Exception $exception)
     {
         if (!$this->isIgnoreReport($exception)) {
-            $isDebug = Config::get('application.debug');
-            if ($isDebug) {
-                $data = [
-                    'file' => $exception->getFile(),
-                    'line' => $exception->getLine(),
-                    'message' => $this->getMessage($exception),
-                    'code' => $this->getCode($exception),
-                ];
-                $log = "[{$data['code']}]{$data['message']}[{$data['file']}:{$data['line']}]";
-            } else {
-                $data = [
-                    'message' => $this->getMessage($exception),
-                    'code' => $this->getCode($exception),
-                ];
-                $log = "[{$data['code']}]{$data['message']}";
-            }
+            $data = [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'message' => $this->getMessage($exception),
+                'code' => $this->getCode($exception),
+            ];
+            $log = "[{$data['code']}] {$data['message']} [{$data['file']}:{$data['line']}]";
             if (Config::get('log.record_trace')) {
-                $log .= "\r\n" . $exception->getTraceAsString();
+                $log .= "\r\n" . $exception->getTraceAsString() . "\r\n" ;
             }
-            Log::error($log, [], true);
+            if (file_exists(Config::get('msfoole.option.log_file'))) {
+                error_log($log, 3, Config::get('msfoole.option.log_file'));
+            } else {
+                error_log($log);
+            }
         }
     }
 
@@ -132,7 +126,7 @@ class Handle
             'message' => $this->getMessage($exception),
             'code' => $this->getCode($exception),
         ];
-        $msg = "[{$data['code']}]{$data['message']}[{$data['file']}:{$data['line']}]";
+        $msg = "[{$data['code']}] {$data['message']} [{$data['file']}:{$data['line']}]";
         $message->setContent($msg);
         $style->setForegroundColor(Style::COLOR_BLUE); // 定义颜色为蓝色
         echo $message->getContentWithStyle($style, PHP_EOL);
