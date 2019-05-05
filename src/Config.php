@@ -137,7 +137,7 @@ class Config
         }
         foreach ($files as $file) {
             if (file_exists($file)) {
-                $object = Loader::factory($type, '\\Julibo\\Msfoole\\Config\\Driver\\', $file);
+                $object = Loader::instance($type, '\\Julibo\\Msfoole\\Config\\Driver\\', $file);
                 $this->set($object->parse());
             }
         }

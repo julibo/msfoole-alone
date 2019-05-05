@@ -26,7 +26,7 @@ class ChannelManger
      * @param $name
      * @param int $size
      */
-    function add($name = 'default', $size = 1024) : void
+    function add($size = 1024, $name = 'default') : void
     {
         if (!isset($this->list[$name])) {
             $chan = new Channel($size);
@@ -38,7 +38,7 @@ class ChannelManger
      * @param $name
      * @return null|Channel
      */
-    function get($name) : ?Channel
+    function get($name = 'default') : ?Channel
     {
         if (isset($this->list[$name])) {
             return $this->list[$name];

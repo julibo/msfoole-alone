@@ -12,7 +12,6 @@
 namespace Julibo\Msfoole\Server;
 
 use Swoole\Process;
-use Swoole\Table;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
 use Swoole\Websocket\Server as Websocket;
@@ -21,12 +20,11 @@ use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Cookie;
-use Julibo\Msfoole\Channel;
-use Julibo\Msfoole\Exception\Handle;
-use Julibo\Msfoole\Exception\ThrowableError;
+use Julibo\Msfoole\Component\ChannelManger;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
+use Julibo\Msfoole\Component\TableManager;
 use Julibo\Msfoole\WebSocket as SocketApp;
 use Julibo\Msfoole\Interfaces\Server as BaseServer;
 
@@ -97,7 +95,7 @@ class HttpServer extends BaseServer
      * 健康检查极限值
      * @var int
      */
-    protected $health_limit = 10;
+    protected $health_limit = 3;
 
     /**
      * @var
@@ -129,6 +127,7 @@ class HttpServer extends BaseServer
     }
 
     /**
+     * 引入事件
      * @return bool
      */
     private function invokeEvent()
@@ -157,13 +156,12 @@ class HttpServer extends BaseServer
     private function createTable()
     {
         if ($this->serverType == 'socket') {
-            $this->table = new table($this->config['table']['size'] ?? 1024);
-            $this->table->column('token', table::TYPE_STRING, 32); // 用户标识符
-            $this->table->column('counter', table::TYPE_INT, 4); // 计数器
-            $this->table->column('create_time', table::TYPE_INT, 4); // 创建时间戳
-            $this->table->column('update_time', table::TYPE_INT, 4); // 更新时间戳
-            $this->table->column('user', table::TYPE_STRING, 2048); // 用户信息描述
-            $this->table->create();
+            $size = $this->config['table']['size'] ?? 1024;
+            TableManager::getInstance()->add('default', [
+                'token' => ['type'=>TableManager::TYPE_STRING, 'size' => 32],
+                'user' => ['type'=>TableManager::TYPE_STRING, 'size' => 2048],
+            ], $size);
+            $this->table = TableManager::getInstance()->get('default');
         }
     }
 
@@ -302,40 +300,27 @@ class HttpServer extends BaseServer
      * Worker进程启动回调
      * @param \Swoole\Server $server
      * @param int $worker_id
-     * @throws \ReflectionException
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        try {
-            // echo "worker进程启动";
-            Helper::setProcessTitle("msfoole:worker-" . $this->appName);
-            // step 0 健康检查
-            if ($worker_id == 0 && $this->health_switch) {
-                swoole_timer_tick(10000, function () use($server) {
-                    $cli = new HttpClient($this->health_host, $this->port);
-                    $result = $cli->get($this->health_uri);
-                    if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
-                        $this->counter++;
-                    } else {
-                        $this->counter = 0;
-                    }
-                    if ($this->counter > $this->health_limit) {
-                        $server->shutdown();
-                    }
-                });
-            }
-            $this->startingWorker();
-        } catch (\Throwable $e) {
-            $handler = new Handle();
-            if (!$e instanceof \Exception) {
-                $e = new ThrowableError($e);
-            }
-            $handler->report($e);
-            if (Config::get('application.debug')) {
-                $handler->renderForConsole($e);
-            }
-            $server->shutdown();
+        // echo "worker进程启动";
+        Helper::setProcessTitle("msfoole:worker-" . $this->appName);
+        // step 0 健康检查
+        if ($worker_id == 0 && $this->health_switch) {
+            swoole_timer_tick(10000, function () use($server) {
+                $cli = new HttpClient($this->health_host, $this->port);
+                $result = $cli->get($this->health_uri);
+                if (empty($result) || empty($result['statusCode']) || $result['statusCode'] != 200) {
+                    $this->counter++;
+                } else {
+                    $this->counter = 0;
+                }
+                if ($this->counter > $this->health_limit) {
+                    $server->shutdown();
+                }
+            });
         }
+        $this->startingWorker();
     }
 
     /**
@@ -346,9 +331,9 @@ class HttpServer extends BaseServer
         // step 1 初始化配置
         $this->resetConfig();
         // step 2 创建通道
-        $chanConfig = $this->config['channel'];
-        $capacity = $chanConfig['capacity'] ?? 100;
-        $this->chan = Channel::instance($capacity);
+        $capacity = $this->config['channel']['capacity'] ?? 100;
+        ChannelManger::getInstance()->add($capacity);
+        $this->chan = ChannelManger::getInstance()->get();
         // step 3 初始化日志
         Log::launch(Config::get('log'), $this->chan);
         // step 4 创建协程工作池
@@ -389,22 +374,10 @@ class HttpServer extends BaseServer
         go(function () {
             while(true) {
                 $data = $this->chan->pop();
-                if (!empty($data) && is_int($data['type'])) {
-                    switch ($data['type']) {
-                        case 2:
-                            // 执行自定义方法
-                            if ($data['class'] && $data['method']) {
-                                $parameter = $data['parameter'] ?? [];
-                                call_user_func_array([$data['class'], $data['method']], $parameter);
-                            }
-                            break;
-                        default:
-                            // 写入日志记录
-                            if (!empty($data['log'])) {
-                                Log::saveData($data['log']);
-                            }
-                            break;
-                    }
+                if (is_callable($data)) {
+                    call_user_func($data);
+                } else if (is_array($data)) {
+                    Log::saveData($data);
                 }
             }
         });
@@ -451,6 +424,8 @@ class HttpServer extends BaseServer
                 $response->status(200);
                 $response->end();
             } else {
+
+
                 $app = new Application($request, $response);
                 $app->handling();
                 if ($event) {

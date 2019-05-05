@@ -49,7 +49,7 @@ class Cache
     {
         $type = !empty($options['driver']) ? $options['driver'] : 'redis';
         $this->driver = $type;
-        return Loader::factory($type, '\\Julibo\\Msfoole\\Cache\\Driver\\', $options);
+        return Loader::instance($type, '\\Julibo\\Msfoole\\Cache\\Driver\\', $options);
     }
 
     /**

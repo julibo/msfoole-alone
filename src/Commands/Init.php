@@ -20,6 +20,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Julibo\Msfoole\Interfaces\Console;
 use Julibo\Msfoole\Interfaces\Server as SwooleServer;
 use Julibo\Msfoole\Facade\Config;
+use Julibo\Msfoole\Loader;
+use Julibo\Msfoole\Exception;
 
 class Init extends Command implements Console
 {
@@ -128,7 +130,6 @@ class Init extends Command implements Console
         Config::set('msfoole.option.pid_file', SERVER_PID . '_' .  $port);
         Config::set('msfoole.option.daemonize', $this->daemon);
         Config::set('msfoole.option.log_file', LOG_PATH . (Config::get('msfoole.option.log_file') ?? 'msfoole.log'));
-        Config::set('msfoole.option.request_slowlog_file',  LOG_PATH . (Config::get('msfoole.option.request_slowlog_file') ?? 'trace.log'));
     }
 
     /**
@@ -222,15 +223,9 @@ class Init extends Command implements Console
         if ($ssl) {
             $type = SWOOLE_SOCK_TCP | SWOOLE_SSL;
         }
-        $swooleClass = "\\Julibo\\Msfoole\\Server\\HttpServer";
-        if (!class_exists($swooleClass)) {
-            $this->output->writeln("<error>Server Class Not Exists : {$swooleClass}</error>");
-            exit(220);
-        }
-        $swoole = new $swooleClass($host, $port, $mode, $type, $option, $this->env, $this->pattern);
+        $swoole = Loader::instance('HttpServer', '\\Julibo\\Msfoole\\Server\\', $host, $port, $mode, $type, $option, $this->env, $this->pattern);
         if (!$swoole instanceof SwooleServer) {
-            $this->output->writeln("<error>Server Class Must extends \\Julibo\\Msfoole\\Interfaces\\Server</error>");
-            exit(230);
+            throw new Exception('Server Class Must extends \\Julibo\\Msfoole\\Interfaces\\Server');
         }
         $this->output->writeln("<comment>Msfoole server started: <{$host}:{$port}> $this->env</comment>");
         $this->output->writeln('You can exit with <info>`CTRL-C`</info>');

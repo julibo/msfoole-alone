@@ -132,9 +132,8 @@ class Log extends ThinkLog
      */
     public function pushRecord($msg, $type = 'info', array $context = [])
     {
-        $data = ['type' => 0];
         $msg = "{$this->ip} {$this->method} {$this->uri} " . $msg;
-        $data['log'] = [
+        $data = [
             'msg' => $msg,
             'type' => $type,
             'context' => $context,
@@ -149,19 +148,21 @@ class Log extends ThinkLog
      */
     public function saveData(array $data)
     {
-        $key = $data['key'] ?? null;
-        if ($key) {
-            $this->key($key);
-        }
-        if ($this->config['sort']) {
-            $msg = sprintf('[ %s-%s ]  %s', $key, microtime(true), $data['msg']);
-        } else {
-            $msg = sprintf('[ %s ]  %s', $key, $data['msg']);
-        }
+        if (!empty($data['msg']) && !empty($data['type'])) {
+            $key = $data['key'] ?? null;
+            if ($key) {
+                $this->key($key);
+            }
+            if ($this->config['sort']) {
+                $msg = sprintf('[ %s-%s ]  %s', $key, microtime(true), $data['msg']);
+            } else {
+                $msg = sprintf('[ %s ]  %s', $key, $data['msg']);
+            }
 
-        $type = $data['type'] ?? 'info';
-        $context = $data['context'] ?? [];
-        $this->record($msg, $type, $context);
+            $type = $data['type'] ?? 'info';
+            $context = $data['context'] ?? [];
+            $this->record($msg, $type, $context);
+        }
     }
 
     /**
