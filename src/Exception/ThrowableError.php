@@ -13,6 +13,11 @@ namespace Julibo\Msfoole\Exception;
 
 class ThrowableError extends \ErrorException
 {
+    /**
+     * ThrowableError constructor.
+     * @param \Throwable $e
+     * @throws \ReflectionException
+     */
     public function __construct(\Throwable $e)
     {
         if ($e instanceof \ParseError) {
@@ -35,6 +40,10 @@ class ThrowableError extends \ErrorException
         $this->setTrace($e->getTrace());
     }
 
+    /**
+     * @param $trace
+     * @throws \ReflectionException
+     */
     protected function setTrace($trace)
     {
         $traceReflector = new \ReflectionProperty('Exception', 'trace');

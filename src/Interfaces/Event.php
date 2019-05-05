@@ -16,11 +16,28 @@ use Swoole\Http\Response;
 
 interface Event
 {
+    /**
+     * 初始化
+     * @return mixed
+     */
     public static function init();
 
+    /**
+     * worker启动
+     * @return mixed
+     */
     public static function onWorkerStart();
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return bool
+     */
     public static function onRequest(Request $request,Response $response) : bool ;
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     */
     public static function afterRequest(Request $request,Response $response) : void;
 }

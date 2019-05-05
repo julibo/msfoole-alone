@@ -13,7 +13,7 @@ namespace Julibo\Msfoole\Component\Context;
 
 interface ContextItemHandlerInterface
 {
-    function onContextCreate();
+    public function onContextCreate();
 
-    function onDestroy($context);
+    public function onDestroy($context);
 }

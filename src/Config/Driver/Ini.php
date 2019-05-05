@@ -13,13 +13,23 @@ namespace Julibo\Msfoole\Config\Driver;
 
 class Ini
 {
+    /**
+     * @var
+     */
     protected $config;
 
+    /**
+     * Ini constructor.
+     * @param $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * @return array|bool
+     */
     public function parse()
     {
         if (is_file($this->config)) {

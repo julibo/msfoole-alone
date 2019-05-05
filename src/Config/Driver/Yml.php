@@ -15,13 +15,23 @@ use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 class Yml
 {
+    /**
+     * @var
+     */
     protected $config;
 
+    /**
+     * Yml constructor.
+     * @param $config
+     */
     public function __construct($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function parse()
     {
         $result = [];

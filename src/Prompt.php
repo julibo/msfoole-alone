@@ -30,10 +30,4 @@ class Prompt
         'OTHER_ERROR' => ['code' => 982, 'msg' => '未知错误'],
     ];
 
-    public static $server = [ // 服务端异常
-        'SERVER_INVALID' => ['code' => 890, 'msg' => '该服务目前无法正常响应'],
-        'NOT_LOGIN' => ['code' => 889, 'msg' => '用户未登录'],
-        'NOT_POWER' => ['code' => 888, 'msg' => '没有操作权限'],
-    ];
-
 }

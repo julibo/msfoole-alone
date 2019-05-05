@@ -22,7 +22,7 @@ use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Cookie;
 use Julibo\Msfoole\Channel;
-use Julibo\Msfoole\Error;
+use Julibo\Msfoole\Exception\Handle;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
@@ -167,7 +167,7 @@ class HttpServer extends BaseServer
     }
 
     /**
-     * 文件监控，不包含配置变化
+     * 文件监控，包含配置变化
      */
     private function monitorProcess()
     {
@@ -255,7 +255,7 @@ class HttpServer extends BaseServer
     public function onWorkerStop(\Swoole\Server $server, int $worker_id)
     {
         // echo "worker进程终止";
-        $tips = sprintf("【%s:%s:%s】worker进程终止", $this->appName, $this->website, $this->port);
+        $tips = sprintf("【%s:%s:%s:%s】worker进程终止", $this->appName, $this->website, $this->port, $worker_id);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -265,8 +265,8 @@ class HttpServer extends BaseServer
      */
     public function onWorkerExit(\Swoole\Server $server, int $worker_id)
     {
-        echo "worker进程退出";
-        $tips = sprintf("【%s:%s:%s:%s】worker进程退出", $this->appName, $this->host, $this->port, $worker_id);
+        // echo "worker进程退出";
+        $tips = sprintf("【%s:%s:%s:%s】worker进程退出", $this->appName, $this->website, $this->port, $worker_id);
         Helper::sendDingRobotTxt($tips);
     }
 
@@ -324,7 +324,12 @@ class HttpServer extends BaseServer
             }
             $this->startingWorker();
         } catch (\Throwable $e) {
-            # todo worker异常处理
+            $handler = new Handle();
+            $handler->report($e);
+            if (Config::get('application.debug')) {
+                $handler->renderForConsole($e);
+            }
+            $server->shutdown();
         }
     }
 
@@ -333,16 +338,14 @@ class HttpServer extends BaseServer
      */
     private function startingWorker()
     {
-        // step 0 初始化配置
+        // step 1 初始化配置
         $this->resetConfig();
-        // step 1 创建通道
+        // step 2 创建通道
         $chanConfig = $this->config['channel'];
         $capacity = $chanConfig['capacity'] ?? 100;
         $this->chan = Channel::instance($capacity);
-        // step 2 初始化日志
+        // step 3 初始化日志
         Log::launch(Config::get('log'), $this->chan);
-        // step 3 注册错误和异常处理机制
-        Error::register();
         // step 4 创建协程工作池
         $this->WorkingPool();
         // step 5 初始化缓存
