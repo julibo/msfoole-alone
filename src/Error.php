@@ -50,9 +50,8 @@ class Error
     }
 
     /**
-     * Exception Handler
-     * @access public
-     * @param  \Exception|\Throwable $e
+     * @param $e
+     * @throws \ReflectionException
      */
     public static function appException($e)
     {

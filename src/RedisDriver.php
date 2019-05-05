@@ -42,7 +42,6 @@ class RedisDriver
         'timeout'    => 0,
         'expire'     => 0,
         'prefix'     => '',
-        'serialize'  => true,
     ];
 
     /**

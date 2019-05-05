@@ -95,7 +95,7 @@ abstract class Driver
      * @param $name
      * @return string
      */
-    protected function getCacheKey($name)
+    protected function getCacheKey($name) : string
     {
         return $this->options['prefix'] . $name;
     }

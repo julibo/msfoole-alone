@@ -21,6 +21,9 @@ class TableManager
     const TYPE_FLOAT = Table::TYPE_FLOAT;
     const TYPE_STRING = Table::TYPE_STRING;
 
+    /**
+     * @var array
+     */
     private $list = [];
 
 
@@ -41,6 +44,10 @@ class TableManager
         }
     }
 
+    /**
+     * @param $name
+     * @return null|Table
+     */
     public function get($name):?Table
     {
         if(isset($this->list[$name])){

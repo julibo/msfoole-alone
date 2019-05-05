@@ -23,6 +23,7 @@ use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Cookie;
 use Julibo\Msfoole\Channel;
 use Julibo\Msfoole\Exception\Handle;
+use Julibo\Msfoole\Exception\ThrowableError;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
@@ -301,6 +302,7 @@ class HttpServer extends BaseServer
      * Worker进程启动回调
      * @param \Swoole\Server $server
      * @param int $worker_id
+     * @throws \ReflectionException
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
@@ -325,6 +327,9 @@ class HttpServer extends BaseServer
             $this->startingWorker();
         } catch (\Throwable $e) {
             $handler = new Handle();
+            if (!$e instanceof \Exception) {
+                $e = new ThrowableError($e);
+            }
             $handler->report($e);
             if (Config::get('application.debug')) {
                 $handler->renderForConsole($e);

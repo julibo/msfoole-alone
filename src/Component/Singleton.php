@@ -13,8 +13,15 @@ namespace Julibo\Msfoole\Component;
 
 trait Singleton
 {
+    /**
+     * @var
+     */
     private static $instance;
 
+    /**
+     * @param mixed ...$args
+     * @return Singleton
+     */
     static function getInstance(...$args)
     {
         if (!isset(self::$instance)) {
