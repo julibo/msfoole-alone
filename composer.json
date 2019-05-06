@@ -31,8 +31,7 @@
     "symfony/yaml": "~4.2.3",
     "chency147/cli-message": "~0.1.1",
     "topthink/think-log": "~1.0",
-    "topthink/think-container": "~1.0",
-    "topthink/think-helper": "~1.0"
+    "topthink/think-container": "~1.0"
   },
   "require-dev" : {
     "easyswoole/phpunit": "^1.0",
