@@ -31,7 +31,7 @@ if (!IS_CLI) {
 // 自动加载
 require ROOT_PATH . 'vendor/autoload.php';
 
-// 加载项目默认配置
+// 加载默认配置
 \Julibo\Msfoole\Facade\Config::loadFile(__DIR__ . '/project.yml', ENV_EXT);
 // 配置文件解析
 \Julibo\Msfoole\Facade\Config::loadConfig(CONF_PATH, CONF_EXT);

@@ -241,7 +241,7 @@ class Init extends Command implements Console
         $pid = $this->getMasterPid();
         if (!$this->isRunning($pid)) {
             $this->output->writeln('<error>No msfoole server process running.</error>');
-            exit(240);
+            exit(220);
         }
         $this->output->writeln('<comment>Stopping msfoole server...</comment>');
         Process::kill($pid, SIGTERM);
@@ -270,7 +270,7 @@ class Init extends Command implements Console
         $pid = $this->getMasterPid();
         if (!$this->isRunning($pid)) {
             $this->output->writeln('<error>No msfoole server process running.</error>');
-            exit(250);
+            exit(230);
         }
         $this->output->writeln('<comment>Reloading msfoole server...</comment>');
         Process::kill($pid, SIGUSR1);

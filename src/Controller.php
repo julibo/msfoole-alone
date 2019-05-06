@@ -112,7 +112,7 @@ abstract class Controller
             if ($user) {
                 $this->user = $user;
             } else {
-                throw new Exception("用户认证失败", 987);
+                throw new Exception(Prompt::$common['AUTH_FAILED']['msg'], Prompt::$common['AUTH_FAILED']['code']);
             }
         }
     }

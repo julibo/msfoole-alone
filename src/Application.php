@@ -11,11 +11,14 @@
 
 namespace Julibo\Msfoole;
 
+
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
 use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cookie;
+use Julibo\Msfoole\Exception\Handle;
+use Julibo\Msfoole\Exception\ThrowableError;
 use Julibo\Msfoole\Component\Context\ContextManager;
 
 class Application
@@ -40,7 +43,6 @@ class Application
      * Application constructor.
      * @param SwooleRequest $request
      * @param SwooleResponse $response
-     * @throws Component\Context\Exception\ModifyError
      */
     public function __construct(SwooleRequest $request, SwooleResponse $response)
     {
@@ -53,7 +55,6 @@ class Application
 
     /**
      * 初始化
-     * @throws Component\Context\Exception\ModifyError
      */
     private function init()
     {
@@ -62,13 +63,26 @@ class Application
         ContextManager::getInstance()->set('httpRequest', $this->httpRequest);
         ContextManager::getInstance()->set('httpResponse', $this->httpResponse);
         Log::info('请求开始，请求参数为 {message}', ['message' => json_encode($this->httpRequest->params)]);
+        defer(function () {
+            $executionTime = round(microtime(true) - $this->beginTime, 6) . 's';
+            $consumeMem = round((memory_get_usage() - $this->beginMem) / 1024, 2) . 'K';
+            Log::info('请求结束，执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
+            if ($executionTime > Config::get('log.slow_time')) {
+                Log::slow('当前方法执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
+            }
+            ContextManager::getInstance()->destroy();
+        });
     }
 
     /**
+     * 检验请求有效性
      * @throws Exception
      */
     private function checkRequest()
     {
+        if (!in_array($this->httpRequest->getRequestMethod(), ['POST', 'GET'])) {
+            throw new Exception(Prompt::$common['WAY_NOT_ALLOW']['msg'], Prompt::$common['WAY_NOT_ALLOW']['code']);
+        }
         $header = $this->httpRequest->getHeader();
         if (empty($header) || empty($header['level']) || empty($header['timestamp']) || empty($header['token']) ||
             empty($header['signer']) || $header['level'] != 2 || $header['timestamp'] > strtotime('10 minutes') * 1000 ||
@@ -89,6 +103,7 @@ class Application
     }
 
     /**
+     * 检验token有效性
      * @throws Exception
      */
     private function checkToken()
@@ -115,35 +130,21 @@ class Application
     {
         try {
             ob_start();
-            # step 1 验证请求合法性(有令牌及白名单则不验证)
+            # step 1 验证请求合法性(白名单不验证)
             $allow = Config::get('application.allow.controller');
             $target = substr($this->httpRequest->namespace . $this->httpRequest->controller, 1);
             if (!((is_array($allow) && in_array($target, $allow)) || (is_string($allow) && $allow == $target))) {
-                if (empty($this->httpRequest->getHeader('permit')) ||
-                    $this->httpRequest->getHeader('permit') != Config::get('msfoole.health.permit')) {
-                    $this->checkToken()->checkRequest();
-                }
+                $this->checkToken()->checkRequest();
             }
             # step 2 调用服务
             $this->working();
             $content = ob_get_clean();
             $this->httpResponse->end($content);
         } catch (\Throwable $e) {
-            if ($e->getCode() == 0) {
-                $code = 911;
-            } else {
-                $code = $e->getCode();
-            }
-            if (Config::get('application.debug')) {
-                $content = ['code' => $code, 'msg'=>$e->getMessage(), 'identification' => $this->httpRequest->identification,
-                    'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
-            } else {
-                $content = ['code' => $code, 'msg'=>$e->getMessage(), 'identification' => $this->httpRequest->identification];
-            }
-            $this->httpResponse->end(json_encode($content));
-            if ($e->getCode() >= 1000) {
-                throw $e;
-            }
+            // 异常响应
+            $this->response($e);
+            // 抛出异常进行日志记录
+            $this->abnormalLog($e);
         }
     }
 
@@ -153,7 +154,7 @@ class Application
      */
     public function working()
     {
-        $controller = Loader::factory($this->httpRequest->controller, $this->httpRequest->namespace, $this->httpRequest);
+        $controller = Loader::instance($this->httpRequest->controller, $this->httpRequest->namespace, $this->httpRequest);
         if(!is_callable(array($controller, $this->httpRequest->action))) {
             throw new Exception(Prompt::$common['METHOD_NOT_EXIST']['msg'], Prompt::$common['METHOD_NOT_EXIST']['code']);
         }
@@ -173,27 +174,40 @@ class Application
     }
 
     /**
-     * 释放资源
-     * @return mixed
+     * 异常响应
+     * @param \Throwable $e
      */
-    private function destruct()
+    private function response(\Throwable $e)
     {
-        $executionTime = round(microtime(true) - $this->beginTime, 6) . 's';
-        $consumeMem = round((memory_get_usage() - $this->beginMem) / 1024, 2) . 'K';
-        Log::info('请求结束，执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
-        if ($executionTime > Config::get('log.slow_time')) {
-            Log::slow('当前方法执行时间{executionTime}，消耗内存{consumeMem}', ['executionTime' => $executionTime, 'consumeMem' => $consumeMem]);
+        if ($e->getCode() == 0) {
+            $code = 911;
+        } else {
+            $code = $e->getCode();
         }
-        unset($this->cookie, $this->httpRequest, $this->httpResponse);
-        ContextManager::getInstance()->destroy();
+        if (Config::get('application.debug')) {
+            $content = ['code' => $code, 'msg'=>$e->getMessage(), 'identification' => $this->httpRequest->identification,
+                'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
+        } else {
+            $content = ['code' => $code, 'msg'=>$e->getMessage(), 'identification' => $this->httpRequest->identification];
+        }
+        $this->httpResponse->end(json_encode($content));
     }
 
     /**
-     * 释放资源
+     * 异常日志记录
+     * @param \Throwable $e
+     * @throws \ReflectionException
      */
-    public function __destruct()
+    private function abnormalLog(\Throwable $e)
     {
-        $this->destruct();
+        if (!$e instanceof \Exception) {
+            $e = new ThrowableError($e);
+        }
+        $handler = new Handle;
+        $handler->report($e, false);
+        if (Config::get('application.debug')) {
+            $handler->renderForConsole($e);
+        }
     }
 
 }

@@ -14,18 +14,17 @@ namespace Julibo\Msfoole\Server;
 use Swoole\Process;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
-use Swoole\Websocket\Server as Websocket;
-use Swoole\WebSocket\Frame as Webframe;
+use Swoole\Websocket\Server as WebSocket;
+use Swoole\WebSocket\Frame as WebFrame;
 use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
 use Julibo\Msfoole\Facade\Cookie;
 use Julibo\Msfoole\Component\ChannelManger;
+use Julibo\Msfoole\Component\TableManager;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
-use Julibo\Msfoole\Component\TableManager;
-use Julibo\Msfoole\WebSocket as SocketApp;
 use Julibo\Msfoole\Interfaces\Server as BaseServer;
 
 class HttpServer extends BaseServer
@@ -377,7 +376,9 @@ class HttpServer extends BaseServer
                 if (is_callable($data)) {
                     call_user_func($data);
                 } else if (is_array($data)) {
-                    Log::saveData($data);
+                    if (!empty($data['msg']) && !empty($data['type'])) {
+                        Log::saveData($data);
+                    }
                 }
             }
         });
@@ -424,8 +425,6 @@ class HttpServer extends BaseServer
                 $response->status(200);
                 $response->end();
             } else {
-
-
                 $app = new Application($request, $response);
                 $app->handling();
                 if ($event) {
@@ -437,29 +436,25 @@ class HttpServer extends BaseServer
 
     /**
      * 连接开启回调
-     * @param Websocket $server
+     * @param WebSocket $server
      * @param SwooleRequest $request
      */
-    public function WebsocketonOpen(Websocket $server, SwooleRequest $request)
+    public function WebsocketonOpen(WebSocket $server, SwooleRequest $request)
     {
         // 开启websocket连接
         print_r($request);
-        $application = new SocketApp($this->table, $this->chan);
-        $application->open($server, $request);
     }
 
     /**
      * Message回调
-     * @param Websocket $server
-     * @param Webframe $frame
+     * @param WebSocket $server
+     * @param WebFrame $frame
      * @throws \Throwable
      */
-    public function WebsocketonMessage(Websocket $server, Webframe $frame)
+    public function WebsocketonMessage(WebSocket $server, WebFrame $frame)
     {
         // 执行应用并响应
         print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
-        $application = new SocketApp($this->table, $this->chan);
-        $application->handling($server, $frame);
     }
 
 }

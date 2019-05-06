@@ -15,6 +15,7 @@ use Exception;
 use Chency147\CliMessage\Message;
 use Chency147\CliMessage\Style;
 use Julibo\Msfoole\Facade\Config;
+use Julibo\Msfoole\Facade\Log;
 
 class Handle
 {
@@ -42,8 +43,9 @@ class Handle
     /**
      * 异常报告
      * @param Exception $exception
+     * @param bool $system
      */
-    public function report(Exception $exception)
+    public function report(Exception $exception, $system = true)
     {
         if (!$this->isIgnoreReport($exception)) {
             $data = [
@@ -56,10 +58,14 @@ class Handle
             if (Config::get('log.record_trace')) {
                 $log .= "\r\n" . $exception->getTraceAsString() . "\r\n" ;
             }
-            if (file_exists(Config::get('msfoole.option.log_file'))) {
-                error_log($log, 3, Config::get('msfoole.option.log_file'));
+            if ($system) {
+                if (file_exists(Config::get('msfoole.option.log_file'))) {
+                    error_log($log, 3, Config::get('msfoole.option.log_file'));
+                } else {
+                    error_log($log);
+                }
             } else {
-                error_log($log);
+                Log::error($log);
             }
         }
     }

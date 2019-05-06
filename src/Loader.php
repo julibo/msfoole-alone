@@ -18,23 +18,6 @@ use Julibo\Msfoole\Component\Di;
 class Loader
 {
     /**
-     * 创建工厂对象实例
-     * @param $name 类名
-     * @param string $namespace 命名空间
-     * @param mixed ...$args
-     * @return mixed
-     */
-    public static function factory($name, $namespace = '', ...$args)
-    {
-        $class = false !== strpos($name, '\\') ? $name : $namespace . ucwords($name);
-        if (class_exists($class)) {
-            return Container::getInstance()->invokeClass($class, $args);
-        } else {
-            throw new ClassNotFoundException('class not exists:' . $class, $class);
-        }
-    }
-
-    /**
      * 实例化
      * @param $name
      * @param string $namespace
