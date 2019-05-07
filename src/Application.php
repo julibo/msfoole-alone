@@ -141,10 +141,14 @@ class Application
             $content = ob_get_clean();
             $this->httpResponse->end($content);
         } catch (\Throwable $e) {
-            // 异常响应
-            $this->response($e);
-            // 抛出异常进行日志记录
-            $this->abnormalLog($e);
+            if ($e->getCode() == 301 || $e->getCode() == 302) {
+                $this->httpResponse->redirect($e->getMessage(), $e->getCode());
+            } else {
+                // 异常响应
+                $this->response($e);
+                // 抛出异常进行日志记录
+                $this->abnormalLog($e);
+            }
         }
     }
 
