@@ -27,4 +27,8 @@ class Prompt
         'OTHER_ERROR' => ['code' => 981, 'msg' => '未知错误'],
     ];
 
+    public static $socket = [ // websocket异常
+        'AUTH_FAILED' => ['code' => 888, 'msg' => '用户认证失败'],
+    ];
+
 }

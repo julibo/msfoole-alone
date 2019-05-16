@@ -14,8 +14,8 @@ namespace Julibo\Msfoole\Server;
 use Swoole\Process;
 use Swoole\Http\Request as SwooleRequest;
 use Swoole\Http\Response as SwooleResponse;
-use Swoole\Websocket\Server as WebSocket;
-use Swoole\WebSocket\Frame as WebFrame;
+use Swoole\Websocket\Server as WebSocketServer;
+use Swoole\WebSocket\Frame as WebSocketFrame;
 use Julibo\Msfoole\Facade\Config;
 use Julibo\Msfoole\Facade\Cache;
 use Julibo\Msfoole\Facade\Log;
@@ -25,6 +25,7 @@ use Julibo\Msfoole\Component\TableManager;
 use Julibo\Msfoole\Helper;
 use Julibo\Msfoole\HttpClient;
 use Julibo\Msfoole\Application;
+use Julibo\Msfoole\WebSocket;
 use Julibo\Msfoole\Interfaces\Server as BaseServer;
 
 class HttpServer extends BaseServer
@@ -436,25 +437,29 @@ class HttpServer extends BaseServer
 
     /**
      * 连接开启回调
-     * @param WebSocket $server
+     * @param WebSocketServer $server
      * @param SwooleRequest $request
      */
-    public function WebsocketonOpen(WebSocket $server, SwooleRequest $request)
+    public function WebsocketonOpen(WebSocketServer $server, SwooleRequest $request)
     {
         // 开启websocket连接
-        print_r($request);
+        // print_r($request);
+        $app = new WebSocket($this->table);
+        $app->open($server, $request);
     }
 
     /**
      * Message回调
-     * @param WebSocket $server
-     * @param WebFrame $frame
+     * @param WebSocketServer $server
+     * @param WebSocketFrame $frame
      * @throws \Throwable
      */
-    public function WebsocketonMessage(WebSocket $server, WebFrame $frame)
+    public function WebsocketonMessage(WebSocketServer $server, WebSocketFrame $frame)
     {
         // 执行应用并响应
-        print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
+        // print_r("receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
+        $app = new WebSocket($this->table);
+        $app->message($server, $frame);
     }
 
 }

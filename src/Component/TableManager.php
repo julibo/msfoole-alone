@@ -48,7 +48,7 @@ class TableManager
      * @param $name
      * @return null|Table
      */
-    public function get($name):?Table
+    public function get($name = 'default'):?Table
     {
         if(isset($this->list[$name])){
             return $this->list[$name];
