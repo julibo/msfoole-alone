@@ -359,7 +359,8 @@ class HttpServer extends BaseServer
         Config::reset();
         Config::loadFile(dirname(__DIR__) . '/project.yml', ENV_EXT);
         Config::loadConfig(CONF_PATH, CONF_EXT);
-        $file = CONF_PATH . 'php-' . strtolower($this->env) . ENV_EXT;
+        $file = sprintf("%sphp-%s.%s", CONF_PATH, strtolower($this->env), ENV_EXT);
+//        $file = CONF_PATH . 'php-' . strtolower($this->env)  . "." . ENV_EXT;
         if (file_exists($file)) {
             Config::loadFile($file, ENV_EXT);
         }

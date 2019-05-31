@@ -138,7 +138,8 @@ class Init extends Command implements Console
      */
     private function setEnvConfig($env)
     {
-        $file = CONF_PATH . 'php-' . strtolower($env) . ENV_EXT;
+        // $file = CONF_PATH . 'php-' . strtolower($env) . "." . ENV_EXT;
+        $file = sprintf("%sphp-%s.%s", CONF_PATH, strtolower($env), ENV_EXT);
         if (file_exists($file)) {
             Config::loadFile($file, ENV_EXT);
         }
