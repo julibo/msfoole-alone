@@ -360,7 +360,6 @@ class HttpServer extends BaseServer
         Config::loadFile(dirname(__DIR__) . '/project.yml', ENV_EXT);
         Config::loadConfig(CONF_PATH, CONF_EXT);
         $file = sprintf("%sphp-%s.%s", CONF_PATH, strtolower($this->env), ENV_EXT);
-//        $file = CONF_PATH . 'php-' . strtolower($this->env)  . "." . ENV_EXT;
         if (file_exists($file)) {
             Config::loadFile($file, ENV_EXT);
         }
@@ -380,6 +379,16 @@ class HttpServer extends BaseServer
                 } else if (is_array($data)) {
                     if (!empty($data['msg']) && !empty($data['type'])) {
                         Log::saveData($data);
+                    }
+                    if (!empty($data['client']) && !empty($data['data'])) {
+                        // 发送广播
+                        foreach($this->table as $fd => $row)
+                        {
+                            if ($row['token'] == $data['client']) {
+                                $this->swoole->push($fd, json_encode($data['data']));
+                                break;
+                            }
+                        }
                     }
                 }
             }

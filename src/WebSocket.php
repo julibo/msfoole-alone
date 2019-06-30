@@ -45,7 +45,9 @@ class WebSocket
      */
     private $websocketFrame;
 
-
+    /**
+     * @var array
+     */
     public static $muster = [];
 
 
@@ -126,9 +128,9 @@ class WebSocket
         } catch (\Throwable $e) {
             $req = json_decode($frame->data, true);
             if (Config::get('application.debug')) {
-                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'data'=>[], 'requestId'=>$req['requestId'], 'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
+                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId'], 'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
             } else {
-                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'data'=>[], 'requestId'=>$req['requestId']];
+                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId']];
             }
             $this->websocketFrame->sendToClient($frame->fd, $data);
             // 抛出异常进行日志记录
@@ -161,31 +163,17 @@ class WebSocket
     private function explainMessage(array $data)
     {
         $user = $this->table->get($this->websocketFrame->getFd());
-        if (empty($user) || empty($data['data']) || empty($data['token']) || empty($data['timestamp']) || empty($data['sign'])  || empty($data['requestId'])) {
+        if (empty($user) || empty($data) || empty($data['token'])) {
             return false;
         }
-        if ($user['token'] != $data['token'] || $data['timestamp'] + 600 < time() ||  $data['timestamp'] - 600 > time()) {
-            return false;
-        }
-        $vi = substr($data['token'], -16);
-        if (Config::get('msfoole.websocket.sign') == null) {
-            $pass = base64_encode(openssl_encrypt(json_encode($data['data']),"AES-128-CBC", Config::get('msfoole.websocket.key'),OPENSSL_RAW_DATA, $vi));
-            if ($pass != $data['sign']) {
-                return false;
-            }
-        } else {
-            if (Config::get('msfoole.websocket.sign') != $data['sign']) {
-                return false;
-            }
-        }
-        if (empty($data['data']['timestamp']) || $data['data']['timestamp'] != $data['timestamp']) {
+        if ($user['token'] != $data['token']) {
             return false;
         }
         return [
-            'module' => $data['data']['module'] ?? Config::get('application.default.controller'),
-            'method' => $data['data']['method'] ?? Config::get('application.default.action'),
-            'arguments' => $data['data']['arguments'] ?? [],
-            'requestId' =>  $data['requestId'],
+            'module' => $data['module'] ?? Config::get('application.default.controller'),
+            'method' => $data['method'] ?? Config::get('application.default.action'),
+            'arguments' => $data['arguments'] ?? [],
+            'requestId' =>  $data['requestId'] ?? 0,
             'user' => json_decode($user['user']),
             'token' => $data['token']
         ];
