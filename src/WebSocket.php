@@ -116,14 +116,17 @@ class WebSocket
                 $this->websocketFrame->disconnect($frame->fd, Prompt::$socket['AUTH_FAILED']['code'],  Prompt::$socket['AUTH_FAILED']['msg']);
             } else {
                 $result = $this->runing($checkResult);
-                if (Config::get('application.debug')) {
-                    $executionTime = round(microtime(true) - $this->beginTime, 6) . 's';
-                    $consumeMem = round((memory_get_usage() - $this->beginMem) / 1024, 2) . 'K';
-                    $data = ['code'=>0, 'data'=>$result, 'requestId'=>$checkResult['requestId'], 'executionTime' =>$executionTime, 'consumeMem' => $consumeMem];
-                } else {
-                    $data = ['code'=>0, 'data'=>$result, 'requestId'=>$checkResult['requestId']];
+                if (!is_null($result)) {
+                    if (Config::get('application.debug')) {
+                        $executionTime = round(microtime(true) - $this->beginTime, 6) . 's';
+                        $consumeMem = round((memory_get_usage() - $this->beginMem) / 1024, 2) . 'K';
+                        $data = ['code'=>0, 'data'=>$result, 'requestId'=>$checkResult['requestId'], 'executionTime' =>$executionTime, 'consumeMem' => $consumeMem];
+                    } else {
+                        $data = ['code'=>0, 'data'=>$result, 'requestId'=>$checkResult['requestId']];
+                    }
+                    $this->websocketFrame->sendToClient($frame->fd, $data);
                 }
-                $this->websocketFrame->sendToClient($frame->fd, $data);
+
             }
         } catch (\Throwable $e) {
             $req = json_decode($frame->data, true);
