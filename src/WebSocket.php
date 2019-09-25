@@ -131,9 +131,9 @@ class WebSocket
         } catch (\Throwable $e) {
             $req = json_decode($frame->data, true);
             if (Config::get('application.debug')) {
-                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId'], 'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
+                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId'] ?? 0, 'extra'=>['file'=>$e->getFile(), 'line'=>$e->getLine()]];
             } else {
-                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId']];
+                $data = ['code'=>$e->getCode(), 'msg'=>$e->getMessage(), 'requestId'=>$req['requestId'] ?? 0];
             }
             $this->websocketFrame->sendToClient($frame->fd, $data);
             // 抛出异常进行日志记录
