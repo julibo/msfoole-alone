@@ -66,10 +66,17 @@ class Log extends ThinkLog
     private function setEnv()
     {
         $httpRequest = ContextManager::getInstance()->get('httpRequest');
-        $this->key = $httpRequest->identification;
-        $this->method = $httpRequest->getRequestMethod();
-        $this->uri = $httpRequest->getRequestUri();
-        $this->ip = $httpRequest->getRemoteAddr();
+        if (empty($httpRequest)) {
+            $this->key = '';
+            $this->method = '';
+            $this->uri = '';
+            $this->ip = '';
+        } else {
+            $this->key = $httpRequest->identification;
+            $this->method = $httpRequest->getRequestMethod();
+            $this->uri = $httpRequest->getRequestUri();
+            $this->ip = $httpRequest->getRemoteAddr();
+        }
     }
 
     /**
@@ -168,9 +175,9 @@ class Log extends ThinkLog
     /**
      * 记录日志信息
      * @access public
-     * @param  string $level     日志级别
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $level 日志级别
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @param bool $force 强制直接写入
      * @return void
      */
@@ -194,8 +201,8 @@ class Log extends ThinkLog
     /**
      * 记录emergency信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function emergency($message, array $context = [])
@@ -206,8 +213,8 @@ class Log extends ThinkLog
     /**
      * 记录警报信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function alert($message, array $context = [])
@@ -218,8 +225,8 @@ class Log extends ThinkLog
     /**
      * 记录紧急情况
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function critical($message, array $context = [])
@@ -230,8 +237,8 @@ class Log extends ThinkLog
     /**
      * 记录错误信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @param bool $force 强制直接写入
      * @return void
      */
@@ -243,8 +250,8 @@ class Log extends ThinkLog
     /**
      * 记录warning信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function warning($message, array $context = [])
@@ -255,8 +262,8 @@ class Log extends ThinkLog
     /**
      * 记录notice信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function notice($message, array $context = [])
@@ -267,8 +274,8 @@ class Log extends ThinkLog
     /**
      * 记录一般信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function info($message, array $context = [])
@@ -279,8 +286,8 @@ class Log extends ThinkLog
     /**
      * 记录调试信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function debug($message, array $context = [])
@@ -291,8 +298,8 @@ class Log extends ThinkLog
     /**
      * 记录sql信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function sql($message, array $context = [])
@@ -303,8 +310,8 @@ class Log extends ThinkLog
     /**
      * 记录慢查询信息
      * @access public
-     * @param  string  $message   日志信息
-     * @param  array  $context   替换内容
+     * @param string $message 日志信息
+     * @param array $context 替换内容
      * @return void
      */
     public function slow($message, array $context = [])
